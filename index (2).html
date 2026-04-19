@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Pase de Sala">
+<title>Pase de sala — Tx hepático pediátrico</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#fff;--bg2:#f8f7f5;--bg3:#f1efe8;
+  --border:rgba(0,0,0,.13);--border2:rgba(0,0,0,.25);
+  --text:#1a1a1a;--text2:#5a5a5a;--text3:#999;
+  --r:8px;--rlg:12px;
+  --pre:#185FA5;--pre-bg:#E6F1FB;--pre-bd:#B5D4F4;
+  --post:#27500A;--post-bg:#EAF3DE;--post-bd:#C0DD97;
+  --int:#854F0B;--int-bg:#FAEEDA;--int-bd:#FAC775;
+  --crit:#791F1F;--crit-bg:#FCEBEB;--crit-bd:#F7C1C1;
+  --retx:#3C3489;--retx-bg:#EEEDFE;--retx-bd:#CECBF6;
+  --pend:#854F0B;--pend-bg:#FAEEDA;--pend-bd:#FAC775;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bot:env(safe-area-inset-bottom,0px);
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#1c1c1e;--bg2:#2c2c2e;--bg3:#3a3a3c;
+  --border:rgba(255,255,255,.12);--border2:rgba(255,255,255,.25);
+  --text:#f2f2f7;--text2:#aeaeb2;--text3:#636366;
+}}
+html,body{height:100%;overflow:hidden;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:var(--text);background:var(--bg);display:flex;flex-direction:column;}
+
+/* HEADER */
+.hdr{padding:calc(.75rem + var(--safe-top)) 1rem .75rem;border-bottom:.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--bg);flex-shrink:0;}
+.hdr h1{font-size:13px;font-weight:700;}
+.hdr p{font-size:10px;color:var(--text2);margin-top:1px;}
+.sync-row{display:flex;align-items:center;gap:5px;}
+.sdot{width:7px;height:7px;border-radius:50%;background:#639922;flex-shrink:0;}
+.sdot.sy{background:#BA7517;animation:pu 1s infinite;}
+.sdot.er{background:#E24B4A;}
+.sdot.of{background:#aaa;}
+@keyframes pu{0%,100%{opacity:1;}50%{opacity:.3;}}
+.slbl{font-size:10px;color:var(--text2);}
+.offline-bar{background:#FAEEDA;border-bottom:.5px solid #FAC775;padding:5px 1rem;font-size:11px;color:#633806;display:none;flex-shrink:0;}
+.offline-bar.show{display:block;}
+
+/* BOTTOM TABS */
+.tabs{display:flex;border-top:.5px solid var(--border);padding-bottom:var(--safe-bot);background:var(--bg);flex-shrink:0;order:99;}
+.tab{flex:1;padding:.55rem .5rem;font-size:11px;cursor:pointer;color:var(--text2);text-align:center;border:none;background:transparent;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.tab.on{color:var(--pre);font-weight:700;}
+.tab-ic{font-size:20px;line-height:1;}
+
+/* SCROLL */
+.scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+/* SALA */
+.sala{padding:.9rem;}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:.9rem;}
+.sc{background:var(--bg2);border-radius:var(--r);padding:.6rem .5rem;border:.5px solid var(--border);text-align:center;}
+.sc-n{font-size:20px;font-weight:700;line-height:1.1;}
+.sc-l{font-size:10px;color:var(--text2);margin-top:1px;line-height:1.3;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:9px;}
+@media(max-width:640px){.grid{grid-template-columns:1fr;}}
+
+/* CARD */
+.card{border-radius:var(--rlg);border:.5px solid var(--border);background:var(--bg);overflow:hidden;cursor:pointer;}
+.card:active{opacity:.85;}
+.card-top{padding:10px 11px 8px;display:flex;gap:8px;}
+.strip{width:4px;border-radius:2px;min-height:52px;flex-shrink:0;}
+.s-pre{background:var(--pre);}.s-post{background:var(--post);}.s-int{background:var(--int);}.s-crit{background:#E24B4A;}.s-retx{background:var(--retx);}
+.cname{font-weight:700;font-size:14px;line-height:1.3;}
+.csub{font-size:11px;color:var(--text2);margin-top:2px;line-height:1.4;}
+.cbrow{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;}
+.cb{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;}
+.cb-pre{background:var(--pre-bg);color:var(--pre);border:.5px solid var(--pre-bd);}
+.cb-post{background:var(--post-bg);color:var(--post);border:.5px solid var(--post-bd);}
+.cb-int{background:var(--int-bg);color:var(--int);border:.5px solid var(--int-bd);}
+.cb-crit{background:var(--crit-bg);color:var(--crit);border:.5px solid var(--crit-bd);}
+.cb-retx{background:var(--retx-bg);color:var(--retx);border:.5px solid var(--retx-bd);}
+.cb-gray{background:var(--bg2);color:var(--text2);border:.5px solid var(--border);}
+.cb-pend{background:var(--pend-bg);color:var(--pend);border:.5px solid var(--pend-bd);}
+.card-labs{padding:6px 11px;border-top:.5px solid var(--border);background:var(--bg2);display:grid;grid-template-columns:repeat(4,1fr);gap:4px;}
+.lbl{font-size:10px;color:var(--text2);}.lbv{font-size:12px;font-weight:700;color:var(--text);}
+.card-pend{padding:5px 11px;border-top:.5px solid var(--pend-bd);background:var(--pend-bg);font-size:10px;color:var(--pend);font-weight:600;}
+.card-alerts{padding:5px 11px;border-top:.5px solid var(--border);display:flex;flex-wrap:wrap;gap:4px;}
+.card-dias{padding:5px 11px;border-top:.5px solid var(--border);background:var(--bg2);display:flex;gap:6px;flex-wrap:wrap;font-size:10px;color:var(--text2);}
+.dias-item{display:flex;gap:3px;align-items:center;}
+.dias-item strong{color:var(--text);font-size:11px;}
+.atb-dias strong{color:var(--pre);}
+.peld-dias strong{color:var(--pre);}
+.card-dias span{font-weight:600;color:var(--text);}
+.add-btn{width:100%;padding:.85rem;border:.5px dashed var(--border2);border-radius:var(--rlg);background:transparent;color:var(--text2);font-size:13px;font-family:inherit;cursor:pointer;margin-top:4px;}
+.add-btn:active{background:var(--bg2);}
+.empty{text-align:center;padding:3rem 1rem;color:var(--text2);}
+.empty .big{font-size:36px;margin-bottom:.5rem;}
+
+/* BADGES */
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;}
+.b-ok{background:#EAF3DE;color:#27500A;}.b-med{background:#FAEEDA;color:#854F0B;}.b-mal{background:#FCEBEB;color:#791F1F;}.b-crit{background:#F7C1C1;color:#501313;}
+.b-pend{background:var(--pend-bg);color:var(--pend);}
+.b-apto{background:#EAF3DE;color:#27500A;}
+
+/* FORM */
+.fs{padding:.9rem;}
+.form-title{font-size:15px;font-weight:700;margin-bottom:.9rem;}
+.sec{margin-bottom:.9rem;}
+.sec-box{background:var(--bg2);border-radius:var(--rlg);padding:.75rem;border:.5px solid var(--border);margin-bottom:.9rem;}
+.slbl{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px;}
+.slbl.green{color:#27500A;background:#EAF3DE;padding:4px 10px;border-radius:20px;display:inline-block;margin-bottom:10px;}
+.slbl.blue{color:var(--pre);background:var(--pre-bg);padding:4px 10px;border-radius:20px;display:inline-block;margin-bottom:10px;}
+.slbl.purple{color:var(--retx);background:var(--retx-bg);padding:4px 10px;border-radius:20px;display:inline-block;margin-bottom:10px;}
+.slbl.orange{color:var(--int);background:var(--int-bg);padding:4px 10px;border-radius:20px;display:inline-block;margin-bottom:10px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+.g4{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+@media(min-width:600px){.g4{grid-template-columns:1fr 1fr 1fr 1fr;}}
+.gc2{grid-column:span 2;}.gca{grid-column:1/-1;}
+.fld{display:flex;flex-direction:column;gap:3px;}
+.fld label{font-size:11px;color:var(--text2);font-weight:500;}
+.fld input,.fld select,.fld textarea{font-size:14px;padding:9px 10px;border:.5px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-family:inherit;-webkit-appearance:none;appearance:none;}
+.fld select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
+.fld textarea{resize:vertical;min-height:65px;line-height:1.6;}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:var(--border2);}
+.fld input.pend{border-color:var(--pend-bd);background:var(--pend-bg);}
+.ar{display:flex;gap:4px;}.ar input{flex:2;}.ar select{flex:1;}
+.tw{display:flex;flex-wrap:wrap;gap:4px;padding:6px 9px;border:.5px solid var(--border);border-radius:var(--r);background:var(--bg);min-height:42px;align-items:center;}
+.tw input{border:none;outline:none;font-size:14px;background:transparent;color:var(--text);font-family:inherit;min-width:80px;flex:1;padding:0;}
+.tg{display:inline-flex;align-items:center;gap:3px;border-radius:20px;padding:3px 9px;font-size:11px;}
+.t-a{background:#E6F1FB;border:.5px solid #B5D4F4;color:#0C447C;}
+.t-i{background:#FAEEDA;border:.5px solid #FAC775;color:#633806;}
+.t-t{background:#EAF3DE;border:.5px solid #C0DD97;color:#27500A;}
+.t-c{background:#EEEDFE;border:.5px solid #CECBF6;color:#3C3489;}
+.tx{cursor:pointer;opacity:.5;font-size:14px;line-height:1;padding:0 2px;}
+.sbox{background:var(--bg2);border-radius:var(--r);padding:9px 12px;font-size:12px;color:var(--text2);border:.5px solid var(--border);margin-top:8px;}
+.ctx-info{border-radius:var(--r);padding:8px 11px;font-size:12px;margin-bottom:8px;line-height:1.5;}
+.ctx-pre{background:var(--pre-bg);border:.5px solid var(--pre-bd);color:var(--pre);}
+.ctx-post{background:var(--post-bg);border:.5px solid var(--post-bd);color:var(--post);}
+.ctx-retx{background:var(--retx-bg);border:.5px solid var(--retx-bd);color:var(--retx);}
+.subsec{background:var(--bg2);border-radius:var(--r);padding:9px 11px;border:.5px solid var(--border);margin-bottom:7px;}
+.ro{display:flex;gap:10px;flex-wrap:wrap;}
+.ropt{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);cursor:pointer;padding:4px 0;}
+/* Evaluaciones grid */
+.eval-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+@media(min-width:500px){.eval-grid{grid-template-columns:1fr 1fr 1fr;}}
+.eval-item{display:flex;flex-direction:column;gap:3px;}
+.eval-item label{font-size:11px;color:var(--text2);font-weight:500;}
+.eval-item select{font-size:13px;padding:6px 8px;border:.5px solid var(--border);border-radius:var(--r);background:var(--bg);color:var(--text);font-family:inherit;-webkit-appearance:none;}
+.eval-item select.pend{border-color:var(--pend-bd);background:var(--pend-bg);color:var(--pend);}
+.eval-item select.apto{border-color:var(--post-bd);background:var(--post-bg);color:var(--post);}
+/* Lab history */
+.lab-hist{background:var(--bg2);border-radius:var(--r);padding:8px 10px;border:.5px solid var(--border);margin-top:6px;font-size:11px;}
+.lab-hist-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:.5px solid var(--border);}
+.lab-hist-row:last-child{border-bottom:none;}
+.form-actions{display:flex;gap:8px;padding-bottom:1.5rem;flex-wrap:wrap;}
+button.primary{background:var(--pre);color:#fff;border:none;border-radius:var(--r);padding:11px 18px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;}
+button.primary:active{opacity:.85;}
+button.secondary{background:var(--bg);color:var(--text);border:.5px solid var(--border2);border-radius:var(--r);padding:11px 16px;font-size:14px;font-family:inherit;cursor:pointer;}
+button.secondary:active{background:var(--bg2);}
+button.danger{background:var(--bg);color:var(--crit);border:.5px solid var(--crit-bd);border-radius:var(--r);padding:11px 16px;font-size:14px;font-family:inherit;cursor:pointer;margin-left:auto;}
+
+/* DETALLE */
+.ds{padding:.9rem;}
+.det-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.9rem;gap:8px;}
+.det-name{font-size:17px;font-weight:700;line-height:1.3;}
+.det-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;}
+.det-back{background:transparent;border:.5px solid var(--border2);border-radius:var(--r);padding:7px 13px;font-size:13px;font-family:inherit;color:var(--text);cursor:pointer;white-space:nowrap;}
+.det-sec{margin-bottom:.9rem;}
+.det-slbl{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px;}
+.det-slbl.green{color:#27500A;}.det-slbl.blue{color:var(--pre);}.det-slbl.orange{color:var(--int);}
+.det-row{display:flex;gap:8px;padding:5px 0;border-bottom:.5px solid var(--border);font-size:13px;}
+.det-row:last-child{border-bottom:none;}
+.det-l{color:var(--text2);min-width:130px;flex-shrink:0;font-size:12px;}
+.det-v{flex:1;line-height:1.5;}
+.det-v.pend{color:var(--pend);font-weight:600;}
+.labgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:5px;}
+.labcard{background:var(--bg2);border-radius:var(--r);padding:8px 10px;border:.5px solid var(--border);}
+.labcard-l{font-size:10px;color:var(--text2);}
+.labcard-v{font-size:15px;font-weight:700;margin-top:2px;line-height:1.2;}
+.labcard-u{font-size:10px;font-weight:400;color:var(--text2);}
+.pillrow{display:flex;flex-wrap:wrap;gap:4px;}
+.det-actions{display:flex;gap:8px;padding:1rem 0 .5rem;flex-wrap:wrap;}
+.eval-det{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+@media(min-width:500px){.eval-det{grid-template-columns:repeat(3,1fr);}}
+.eval-card{background:var(--bg2);border-radius:var(--r);padding:6px 9px;border:.5px solid var(--border);}
+.eval-card.pend{background:var(--pend-bg);border-color:var(--pend-bd);}
+.eval-card.apto{background:var(--post-bg);border-color:var(--post-bd);}
+.eval-card-l{font-size:10px;color:var(--text2);}
+.eval-card-v{font-size:12px;font-weight:600;margin-top:2px;}
+.eval-card.pend .eval-card-v{color:var(--pend);}
+.eval-card.apto .eval-card-v{color:var(--post);}
+.peld-box{background:var(--pre-bg);border:.5px solid var(--pre-bd);border-radius:var(--r);padding:10px 14px;display:flex;gap:20px;align-items:center;margin-top:6px;}
+.peld-item{text-align:center;}
+.peld-n{font-size:22px;font-weight:700;color:var(--pre);}
+.peld-l{font-size:10px;color:var(--text2);margin-top:1px;}
+.fk-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:5px;}
+.fk-table th{background:var(--bg2);padding:5px 7px;text-align:center;border:.5px solid var(--border);font-size:10px;color:var(--text2);}
+.fk-table td{padding:5px 7px;text-align:center;border:.5px solid var(--border);}
+.sala-loc-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:.9rem;}
+.loc-card{flex:1;min-width:120px;border-radius:var(--r);padding:9px 12px;border:.5px solid var(--border);}
+.loc-uci{background:var(--crit-bg);border-color:var(--crit-bd);}
+.loc-cim{background:var(--post-bg);border-color:var(--post-bd);}
+.loc-otro{background:var(--bg2);border-color:var(--border);}
+.loc-n{font-size:22px;font-weight:700;line-height:1.1;}
+.loc-uci .loc-n{color:var(--crit);}
+.loc-cim .loc-n{color:var(--post);}
+.loc-l{font-size:11px;font-weight:700;margin-top:1px;}
+.loc-uci .loc-l{color:var(--crit);}
+.loc-cim .loc-l{color:var(--post);}
+.loc-otro .loc-l{color:var(--text2);}
+.loc-names{font-size:10px;color:var(--text2);margin-top:3px;line-height:1.4;}
+</style>
+</head>
+<body>
+
+<div class="offline-bar" id="ob"></div>
+
+<div class="hdr">
+  <div>
+    <h1>Pase de sala — Tx hepático pediátrico</h1>
+    <p id="fhdr"></p>
+  </div>
+  <div class="sync-row">
+    <div class="sdot of" id="sdot"></div>
+    <span id="slbl" class="slbl">...</span>
+  </div>
+</div>
+
+<div class="scroll" id="ms">
+  <div id="pnl-sala" class="sala">
+    <div class="stats" style="grid-template-columns:repeat(3,1fr);">
+      <div class="sc"><div class="sc-n" id="st0">0</div><div class="sc-l">Total</div></div>
+      <div class="sc" style="border-color:var(--pre-bd);"><div class="sc-n" style="color:var(--pre);" id="st1">0</div><div class="sc-l">Pre-Tx</div></div>
+      <div class="sc" style="border-color:var(--retx-bd);"><div class="sc-n" style="color:var(--retx);" id="st3">0</div><div class="sc-l">Re-Tx</div></div>
+    </div>
+    <div class="sala-loc-row" id="sala-loc-row"></div>
+    <div class="grid" id="grid"></div>
+    <button class="add-btn" onclick="swForm(null)">+ Agregar paciente</button>
+  </div>
+  <div id="pnl-det" style="display:none;" class="ds"><div id="dc"></div></div>
+  <div id="pnl-form" style="display:none;" class="fs"><div id="fc"></div></div>
+</div>
+
+<div class="tabs">
+  <button class="tab on" id="t-sala" onclick="swSala()"><span class="tab-ic">🏥</span>Sala</button>
+  <button class="tab" id="t-nuevo" onclick="swForm(null)"><span class="tab-ic">＋</span>Nuevo</button>
+  <button class="tab" id="t-sync" onclick="forceSync()"><span class="tab-ic">↻</span>Sync</button>
+</div>
+
+<script>
+const SU='https://script.google.com/macros/s/AKfycbywMhRbg3_ddatC14sjjZmPR1-GXnrSjoZNH_YA3g7xY4T_W7FzxfIbxXkitYSrNkXlIQ/exec';
+const SK='pase_v7';
+let PXS=[],LH='',EID=null,FT={a:[],i:[],t:[]},FC=[],FKH=[],online=navigator.onLine,pending=[];
+
+document.getElementById('fhdr').textContent=new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
+window.addEventListener('online',()=>{online=true;obUpdate();flush().then(()=>pull());});
+window.addEventListener('offline',()=>{online=false;obUpdate();setSof();});
+
+// ---- UTILS ----
+function diasDesde(fecha){
+  if(!fecha)return null;
+  const d=new Date(fecha),hoy=new Date();
+  hoy.setHours(0,0,0,0);d.setHours(0,0,0,0);
+  return Math.floor((hoy-d)/(1000*60*60*24));
+}
+function fechaHoy(){return new Date().toISOString().split('T')[0];}
+function fmtFecha(f){if(!f)return'—';const[y,m,d]=f.split('-');return`${d}/${m}/${y}`;}
+
+// ---- NAV ----
+function swSala(){hide(['pnl-det','pnl-form']);show('pnl-sala');setTab('t-sala');top();}
+function swDet(id){const p=PXS.find(x=>x.id===id);if(!p)return;hide(['pnl-sala','pnl-form']);show('pnl-det');renderDet(p);setTab('');top();}
+function swForm(p){
+  EID=p?p.id:null;
+  FT={a:[...(p?p.abx||[]:[])] ,i:[...(p?p.is_extra||[]:[])] ,t:[...(p?p.atb||[]:[])]};
+  FC=[...(p?p.cults||[]:[])] ;
+  FKH=[...(p?p.fk_history||[]:[])] ;
+  hide(['pnl-sala','pnl-det']);show('pnl-form');setTab('t-nuevo');buildForm(p);top();
+}
+function hide(ids){ids.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});}
+function show(id){const el=document.getElementById(id);if(el)el.style.display='';}
+function setTab(on){['t-sala','t-nuevo','t-sync'].forEach(id=>document.getElementById(id)?.classList.toggle('on',id===on));}
+function top(){const s=document.getElementById('ms');if(s)s.scrollTop=0;}
+
+// ---- ESTADO ----
+function getE(p){
+  if(p.momento==='retx')return'retx';
+  return p.momento==='pre'?'pre':'post';
+}
+function getBdgT(p){
+  const e=getE(p);
+  if(e==='pre')return'Pre-trasplante';
+  if(e==='retx')return'Re-trasplante';
+  return{post_inmediato:'Post-Tx inmediato',post_temprano:'Post-Tx temprano',post_tardio:'Post-Tx tardío (>6m)'}[p.momento]||'Post-Tx';
+}
+
+// ---- PENDIENTES ----
+function getPendientes(p){
+  const pends=[];
+  if(p.momento==='pre'||p.momento==='retx'){
+    const evals=['cardio','neumo','nefro','infecto','neuro','orl','oftalmo','salud_mental','s_social','alimentacion','gineco'];
+    evals.forEach(e=>{if(p['eval_'+e]==='pendiente')pends.push(e.replace('_',' '));});
+    if(p.problema_actual&&p.problema_actual.trim())pends.push('Problema: '+p.problema_actual);
+  }
+  if(p.pendientes&&p.pendientes.trim()){
+    p.pendientes.split('\n').forEach(l=>{if(l.trim())pends.push(l.trim());});
+  }
+  return pends;
+}
+
+// ---- SALA RENDER ----
+function renderSala(pxs){
+  document.getElementById('st0').textContent=pxs.length;
+  document.getElementById('st1').textContent=pxs.filter(p=>p.momento==='pre').length;
+  document.getElementById('st3').textContent=pxs.filter(p=>p.momento==='retx').length;
+  // Sala breakdown
+  const byLoc={};
+  pxs.forEach(p=>{if(p.sala){const k=p.sala;byLoc[k]=(byLoc[k]||0)+1;}});
+  const locRow=document.getElementById('sala-loc-row');
+  if(locRow){
+    const uci=pxs.filter(p=>p.sala&&p.sala.toLowerCase().includes('uci'));
+    const cim=pxs.filter(p=>p.sala&&p.sala.toLowerCase().includes('cim'));
+    const otros=pxs.filter(p=>p.sala&&!p.sala.toLowerCase().includes('uci')&&!p.sala.toLowerCase().includes('cim'));
+    let html='';
+    if(uci.length)html+=`<div class="loc-card loc-uci"><div class="loc-n">${uci.length}</div><div class="loc-l">UCI</div><div class="loc-names">${uci.map(p=>p.nombre.split(',')[0]).join(', ')}</div></div>`;
+    if(cim.length)html+=`<div class="loc-card loc-cim"><div class="loc-n">${cim.length}</div><div class="loc-l">CIM</div><div class="loc-names">${cim.map(p=>p.nombre.split(',')[0]).join(', ')}</div></div>`;
+    if(otros.length)html+=otros.map(p=>`<div class="loc-card loc-otro"><div class="loc-n">1</div><div class="loc-l">${p.sala}</div><div class="loc-names">${p.nombre.split(',')[0]}</div></div>`).join('');
+    locRow.innerHTML=html;
+  }
+  const sc={pre:'s-pre',post:'s-post',int:'s-int',crit:'s-crit',retx:'s-retx'};
+  const bc={pre:'cb-pre',post:'cb-post',int:'cb-int',crit:'cb-crit',retx:'cb-retx'};
+  const alts=p=>{const a=[];
+    if(p.vascular&&p.vascular!=='No')a.push({t:'Comp. vascular',c:'b-crit'});
+    if(p.rechazo&&p.rechazo!=='No')a.push({t:'Rechazo',c:'b-mal'});
+    if(p.ptld&&p.ptld!=='No')a.push({t:'PTLD',c:'b-crit'});
+    if(p.infec&&p.infec!=='No')a.push({t:p.infec,c:'b-mal'});
+    return a;
+  };
+  const g=document.getElementById('grid');
+  if(!pxs.length){g.innerHTML='<div class="empty"><div class="big">🏥</div>No hay pacientes.<br>Usá + Nuevo para agregar.</div>';return;}
+  g.innerHTML=pxs.map(p=>{
+    const e=getE(p);
+    const als=alts(p);
+    const pends=getPendientes(p);
+    const diasInt=diasDesde(p.fecha_ingreso);
+    const diasPost=p.momento!=='pre'&&p.momento!=='retx'?diasDesde(p.fecha_tx):null;
+    const diasAtb=p.fecha_inicio_atb?diasDesde(p.fecha_inicio_atb):null;
+    return`<div class="card" onclick="swDet(${p.id})">
+      <div class="card-top">
+        <div class="strip ${sc[e]}"></div>
+        <div style="flex:1;min-width:0;">
+          <div class="cname">${p.nombre}</div>
+          <div class="csub">${p.edad||''} · ${p.peso?p.peso+' kg':''} · ${p.diag||'—'}</div>
+          ${p.sala?`<div class="csub" style="font-weight:600;color:var(--text2);">${p.sala}${p.lugar_int?' — '+p.lugar_int:''}</div>`:''}
+          <div class="cbrow">
+            <span class="cb ${bc[e]}">${getBdgT(p)}</span>
+            ${p.estado?`<span class="cb cb-gray">${p.estado}</span>`:''}
+
+            ${p.lista_estado?`<span class="cb ${p.lista_estado==='Activo'?'cb-post':'cb-gray'}">${p.lista_estado}</span>`:''}
+          </div>
+        </div>
+      </div>
+      <div class="card-labs">
+        ${[['Bili',p.bili],['INR',p.inr],['TGO',p.tgo],['Cr',p.creat]].map(([l,v])=>`<div><div class="lbl">${l}</div><div class="lbv">${v||'—'}</div></div>`).join('')}
+      </div>
+      ${(diasInt!==null||diasPost!==null||diasAtb!==null||p.peld)?`<div class="card-dias">
+        ${diasInt!==null?`<span class="dias-item">Internado <strong>${diasInt}d</strong></span>`:''}
+        ${diasPost!==null?`<span class="dias-item">Post-Tx <strong>${diasPost}d</strong></span>`:''}
+        ${diasAtb!==null?`<span class="dias-item atb-dias">ATB <strong>${diasAtb}d</strong></span>`:''}
+        ${p.momento==='pre'&&p.peld?`<span class="dias-item peld-dias">PELD <strong>${p.peld}</strong></span>`:''}
+      </div>`:''}
+      ${pends.length?`<div class="card-pend">⚠ Pendiente: ${pends.slice(0,2).join(' · ')}${pends.length>2?' +'+( pends.length-2)+'':''}</div>`:''}
+      ${als.length?`<div class="card-alerts">${als.map(a=>`<span class="badge ${a.c}">${a.t}</span>`).join('')}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ---- DETALLE ----
+function renderDet(p){
+  const e=getE(p);
+  const bc={pre:'cb-pre',post:'cb-post',int:'cb-int',crit:'cb-crit',retx:'cb-retx'}[e];
+  const bt=getBdgT(p);
+  const pp=(arr,cls)=>arr&&arr.length?`<div class="pillrow">${arr.map(v=>`<span class="tg ${cls}">${v}</span>`).join('')}</div>`:'<span style="color:var(--text2)">—</span>';
+  const rw=(l,v,isPend)=>v&&v!=='No'&&v!=='—'&&v!==''?`<div class="det-row"><span class="det-l">${l}</span><span class="det-v${isPend?' pend':''}">${v}</span></div>`:'';
+  const sc=score(p);
+  const pends=getPendientes(p);
+  const diasInt=diasDesde(p.fecha_ingreso);
+  const diasPost=p.momento!=='pre'&&p.momento!=='retx'?diasDesde(p.fecha_tx):null;
+  const diasAtb=p.fecha_inicio_atb?diasDesde(p.fecha_inicio_atb):null;
+
+  // Lab history
+  const labHist=p.lab_history||[];
+  const labActual=labHist.length>0?labHist[labHist.length-1]:null;
+
+  const evalItems=[
+    ['cardio','Cardiología'],['neumo','Neumología'],['nefro','Nefrología'],
+    ['infecto','Infectología'],['neuro','Neurología'],['orl','ORL'],
+    ['oftalmo','Oftalmología'],['salud_mental','Salud Mental'],
+    ['s_social','Servicio Social'],['alimentacion','Alimentación'],['gineco','Ginecología']
+  ];
+
+  document.getElementById('dc').innerHTML=`
+  <div class="det-hdr">
+    <div>
+      <div class="det-name">${p.nombre}</div>
+      <div class="det-badges">
+        <span class="cb ${bc}">${bt}</span>
+        ${p.estado?`<span class="cb cb-gray">${p.estado}</span>`:''}
+
+        ${p.lista_estado?`<span class="cb ${p.lista_estado==='Activo'?'cb-post':'cb-gray'}">${p.lista_estado}</span>`:''}
+      </div>
+    </div>
+    <button class="det-back" onclick="swSala()">← Sala</button>
+  </div>
+
+  ${pends.length?`<div style="background:var(--pend-bg);border:.5px solid var(--pend-bd);border-radius:var(--r);padding:8px 12px;margin-bottom:.9rem;font-size:12px;color:var(--pend);font-weight:600;">
+    ⚠ Pendientes: ${pends.join(' · ')}
+  </div>`:''}
+
+  <div class="det-sec"><div class="det-slbl">Datos del paciente</div>
+    ${rw('Edad / Peso',(p.edad||'—')+' · '+(p.peso||'—')+' kg')}
+    ${rw('Diagnóstico / Enf. base',p.diag+(p.enf_base?' — '+p.enf_base:''))}
+    ${rw('HC',p.hc)}
+    ${rw('Cirugía previa',p.cirugia_previa)}
+    ${rw('Nacionalidad / Residencia',(p.nacionalidad||'')+(p.residencia?' / '+p.residencia:''))}
+    ${rw('Fecha ingreso',fmtFecha(p.fecha_ingreso)+(diasInt!==null?' ('+diasInt+' días)':''))}
+    ${rw('Lugar internación',p.lugar_int)}
+  </div>
+
+  <div class="det-sec"><div class="det-slbl">Motivo de internación</div>
+    <div style="font-size:13px;line-height:1.7;white-space:pre-wrap;">${p.motivo||'—'}</div>
+
+  </div>
+
+  ${p.momento==='pre'||p.momento==='retx'?`
+  <div class="det-sec"><div class="det-slbl green">Pre-trasplante</div>
+    ${p.peld||p.meld?`<div class="peld-box">
+      ${p.peld?`<div class="peld-item"><div class="peld-n">${p.peld}</div><div class="peld-l">PELD</div></div>`:''}
+      ${p.meld?`<div class="peld-item"><div class="peld-n">${p.meld}</div><div class="peld-l">MELD</div></div>`:''}
+      ${p.lista_estado?`<div class="peld-item"><div class="peld-n" style="font-size:14px;">${p.lista_estado}</div><div class="peld-l">Lista</div></div>`:''}
+      ${p.fecha_lista?`<div class="peld-item"><div class="peld-n" style="font-size:14px;">${fmtFecha(p.fecha_lista)}</div><div class="peld-l">Fecha lista</div></div>`:''}
+    </div>`:''}
+    ${rw('Complicaciones cirrosis',p.complic_cirrosis)}
+    ${rw('Grupo y factor',p.grupo_factor)}
+    ${rw('Antropometría','Talla: '+(p.talla||'—')+' cm · Peso: '+(p.peso||'—')+' kg'+(p.pu?' · PU: '+p.pu+' cm':''))}
+    <div class="det-slbl" style="margin-top:10px;">Evaluaciones pre-trasplante</div>
+    <div class="eval-det">
+      ${evalItems.map(([k,lbl])=>{
+        const val=p['eval_'+k]||'';
+        const cls=val==='pendiente'?'pend':val==='apto'||val==='ok'?'apto':'';
+        return val?`<div class="eval-card ${cls}"><div class="eval-card-l">${lbl}</div><div class="eval-card-v">${val}</div></div>`:'';
+      }).join('')}
+    </div>
+    ${p.problema_actual?`<div style="margin-top:8px;">${rw('Problema actual',p.problema_actual,true)}</div>`:''}
+  </div>` :''}
+
+  ${p.momento!=='pre'?`
+  <div class="det-sec"><div class="det-slbl blue">Post-trasplante</div>
+    ${rw('Fecha Tx',fmtFecha(p.fecha_tx)+(diasPost!==null?' (día '+diasPost+')':''))}
+    ${rw('Donante / Tipo injerto',(p.donante||'—')+' / '+(p.tipo_injerto||'—'))}
+    ${rw('GRWR',p.grwr)}
+    ${rw('Peso explante / implante',(p.peso_explante||'—')+' / '+(p.peso_implante||'—')+' g')}
+    ${rw('Piggy back / Portoplastia',(p.piggy_back||'—')+' / '+(p.portoplastia||'—'))}
+    ${rw('Graft art / ven',(p.graft_art||'—')+' / '+(p.graft_ven||'—'))}
+    ${rw('Vía biliar / TIF',(p.via_biliar||'—')+' / '+(p.tif||'—'))}
+    ${rw('Cobertura',p.cobertura)}
+    ${p.complicaciones_post&&p.complicaciones_post.length?`<div class="det-slbl" style="margin-top:8px;">Complicaciones post-Tx</div>
+    <div style="font-size:12px;line-height:1.7;">${p.complicaciones_post.map(c=>`<div>• ${fmtFecha(c.fecha)} — ${c.desc}</div>`).join('')}</div>`:''}
+  </div>` :''}
+
+  ${p.momento==='retx'?`
+  <div class="det-sec"><div class="det-slbl" style="color:var(--retx);">Re-trasplante</div>
+    ${rw('Causa fallo injerto previo',p.causa_fallo)}
+    ${rw('Fecha re-Tx',fmtFecha(p.fecha_retx))}
+  </div>`:''}
+
+  <div class="det-sec"><div class="det-slbl">Laboratorio</div>
+    ${labActual?`<div style="font-size:10px;color:var(--text2);margin-bottom:5px;">Último: ${fmtFecha(labActual.fecha)}</div>`:''}
+    <div class="labgrid">
+      ${[['Bili total',labActual?.bili||p.bili,'mg/dL'],['TGO/AST',labActual?.tgo||p.tgo,'U/L'],['TGP/ALT',labActual?.tgp||p.tgp,'U/L'],['GGT',labActual?.ggt||p.ggt,'U/L'],['Quick/TP',labActual?.tp||p.tp,'%'],['INR',labActual?.inr||p.inr,''],['Albúmina',labActual?.alb||p.alb,'g/dL'],['Creatinina',labActual?.creat||p.creat,'mg/dL']].map(([l,v,u])=>`<div class="labcard"><div class="labcard-l">${l}</div><div class="labcard-v">${v||'—'}<span class="labcard-u"> ${u}</span></div></div>`).join('')}
+    </div>
+    ${labHist.length>1?`<div class="lab-hist"><div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:5px;">Historial de laboratorio</div>
+    ${[...labHist].reverse().slice(0,5).map(l=>`<div class="lab-hist-row"><span style="color:var(--text2);">${fmtFecha(l.fecha)}</span><span>Bili ${l.bili||'—'} · INR ${l.inr||'—'} · TGO ${l.tgo||'—'}</span></div>`).join('')}
+    </div>`:''}
+  </div>
+
+  ${p.momento!=='pre'&&p.fk_history&&p.fk_history.length?`
+  <div class="det-sec"><div class="det-slbl blue">Niveles de tacrolimus (FK)</div>
+    <table class="fk-table">
+      <tr><th>Fecha</th><th>Nivel (ng/mL)</th><th>Dosis</th></tr>
+      ${[...p.fk_history].reverse().slice(0,6).map(f=>`<tr><td>${fmtFecha(f.fecha)}</td><td><strong>${f.nivel||'—'}</strong></td><td>${f.dosis||'—'}</td></tr>`).join('')}
+    </table>
+  </div>`:''}
+
+  ${p.momento!=='pre'?`
+  <div class="det-sec"><div class="det-slbl blue">Inmunosupresión</div>
+    ${p.mostrarInd?`${rw('Riesgo inmunológico',p.riesgo)}
+    ${rw('ATG',p.atg+(p.atg_d?' — '+p.atg_d+' mg/kg':''))}
+    ${rw('Basiliximab',p.basili)}
+    ${rw('Metilprednisolona IV',p.mp)}`:''}
+    ${rw('Tacrolimus (FK)',p.tacro?(p.tacro+' ng/mL'+(p.tacro_obj?' (obj: '+p.tacro_obj+')':'')):'')}
+    ${rw('MMF',p.mmf)}${rw('Corticoides',p.cort)}${rw('mTOR',p.mtor)}
+    ${p.is_extra&&p.is_extra.length?rw('Otros IS',p.is_extra.join(', ')):''}
+  </div>
+  <div class="det-sec"><div class="det-slbl">Complicaciones</div>
+    ${rw('Rechazo',p.rechazo)}${rw('Vascular',p.vascular)}
+    ${rw('Biliar',p.biliar)}${rw('Infección',p.infec)}
+    ${rw('PTLD',p.ptld)}${p.otras?rw('Otras',p.otras):''}
+  </div>`:''}
+
+  <div class="det-sec"><div class="det-slbl">ATB / profilaxis</div>
+    ${p.fecha_inicio_atb?`<div style="font-size:11px;color:var(--text2);margin-bottom:5px;">Inicio ATB: ${fmtFecha(p.fecha_inicio_atb)}${diasAtb!==null?' (día '+diasAtb+')':''}</div>`:''}
+    ${pp(p.abx,'t-a')}
+    <div style="font-size:11px;color:var(--text2);margin-top:6px;">CMV: ${p.pcmv||'No'} · PCP: ${p.ppcp||'No'} · Antifúngico: ${p.paf||'No'}</div>
+  </div>
+
+  <div class="det-sec"><div class="det-slbl">Cultivos y cargas virales</div>${pp(p.cults,'t-c')}</div>
+  <div class="det-sec"><div class="det-slbl">Antitrombótico</div>${pp(p.atb,'t-t')}</div>
+
+  <div class="det-sec"><div class="det-slbl">Nutrición y soporte</div>
+    ${rw('Alimentación',p.nutri)}${p.diur?rw('Diuresis',p.diur+' mL/kg/h'):''}
+    ${rw('Ventilación',p.vent)}${rw('Soporte hemodinámico',p.hemodi)}
+  </div>
+
+  ${p.obs?`<div class="det-sec"><div class="det-slbl">Plan del día</div><div style="font-size:13px;line-height:1.7;white-space:pre-wrap;">${p.obs}</div></div>`:''}
+
+  <div class="det-sec"><div class="det-slbl">Pronóstico estimado</div>
+    <div class="sbox"><span class="badge ${sc.cls}">${sc.niv}</span>${sc.de!==null?` <span style="font-size:11px;color:var(--text2);">~${sc.de} días adicionales</span>`:''}</div>
+  </div>
+
+  <div class="det-actions">
+    <button class="secondary" onclick="swForm(PXS.find(x=>x.id===${p.id}))">Editar</button>
+    <button class="primary" style="background:var(--post);margin-left:auto;" onclick="darDeAlta(${p.id})">Dar de alta ✓</button>
+  </div>`;
+}
+
+// ---- FORM ----
+function buildForm(p){
+  const v=(f,fb='')=>p!=null?(p[f]!=null?p[f]:fb):fb;
+  const opt=(opts,cur)=>opts.map(o=>`<option value="${o}"${cur===o?' selected':''}>${o}</option>`).join('');
+  const mo=v('momento');
+  const isPre=mo==='pre';
+  const isPost=mo&&mo!=='pre';
+  const isRetx=mo==='retx';
+  const labHist=p?p.lab_history||[]:[];
+  const fkHist=p?p.fk_history||[]:[];
+  const compPost=p?p.complicaciones_post||[]:[];
+
+  document.getElementById('fc').innerHTML=`
+  <div class="form-title">${EID?'Editar':'Nuevo'} paciente</div>
+
+  <div class="sec-box">
+    <div class="slbl">Contexto clínico</div>
+    <div class="fld gca" style="margin-bottom:8px;"><label>Momento respecto al trasplante</label>
+      <select id="fmo" onchange="fctx()">
+        <option value="">— seleccionar —</option>
+        ${[['pre','Pre-trasplante (lista / evaluación)'],['post_inmediato','Post-Tx inmediato (UCI / primeras 2 semanas)'],['post_temprano','Post-Tx temprano (2 sem – 6 meses)'],['post_tardio','Post-Tx tardío (más de 6 meses)'],['retx','Re-trasplante']].map(([val,lbl])=>`<option value="${val}"${v('momento')===val?' selected':''}>${lbl}</option>`).join('')}
+      </select>
+    </div>
+    <div class="g2">
+      <div class="fld"><label>Estado general</label>
+        <select id="fest"><option value="">—</option>${opt(['Estable','Compensado','Inestable','Crítico (UCI/UTIP)'],v('estado'))}</select>
+      </div>
+
+    <div id="fctxb" class="ctx-info" style="display:none;margin-top:8px;"></div>
+  </div>
+
+  <div class="sec-box">
+    <div class="slbl">Identificación</div>
+    <div class="g2">
+      <div class="fld gca"><label>Nombre y apellido</label><input id="fnom" value="${v('nombre')}" placeholder="Apellido, Nombre" autocapitalize="words"></div>
+      <div class="fld"><label>Edad</label>
+        <div class="ar"><input id="fedad" type="number" min="0" inputmode="decimal" value="${v('edad_n')}" placeholder="número"><select id="fedadu">${opt(['años','meses','días'],v('edad_u','años'))}</select></div>
+      </div>
+      <div class="fld"><label>Peso (kg)</label><input id="fpeso" type="number" step="0.1" inputmode="decimal" value="${v('peso')}" placeholder="kg"></div>
+      <div class="fld gca"><label>Diagnóstico (categoría)</label>
+        <select id="fdiag"><option value="">—</option>${['Atresia de vías biliares','Síndrome de Alagille','Colestasis intrahepática progresiva (PFIC)','Colangitis esclerosante primaria','Enfermedad de Wilson','Tirosinemia tipo I','Déficit de alfa-1 antitripsina','Glucogenosis','Acidemia orgánica','Defecto del ciclo de la urea','Otra enfermedad metabólica','Falla hepática aguda (FH)','Cirrosis (otra causa)','Hepatoblastoma','Hepatitis autoinmune (HAI)','Síndrome de Budd-Chiari','Otro'].map(o=>`<option${v('diag')===o?' selected':''}>${o}</option>`).join('')}</select>
+      </div>
+      <div class="fld"><label>Enfermedad de base</label><input id="fenf_base" value="${v('enf_base')}" placeholder="Ej: HAI, AVB..."></div>
+      <div class="fld"><label>HC</label><input id="fhc" value="${v('hc')}" placeholder="Nº historia clínica"></div>
+      <div class="fld"><label>Cirugía previa</label><input id="fcirugia" value="${v('cirugia_previa')}" placeholder="No / Kasai / ..."></div>
+      <div class="fld"><label>Nacionalidad</label><input id="fnac" value="${v('nacionalidad')}" placeholder="Argentino/a"></div>
+      <div class="fld"><label>Residencia</label><input id="fres" value="${v('residencia')}" placeholder="Provincia"></div>
+      <div class="fld"><label>Grupo y factor</label><input id="fgf" value="${v('grupo_factor')}" placeholder="0+, A-, ..."></div>
+      <div class="fld"><label>Fecha de ingreso</label><input id="ffi" type="date" value="${v('fecha_ingreso',fechaHoy())}"></div>
+      <div class="fld"><label>Lugar de internación</label><input id="flugar" value="${v('lugar_int')}" placeholder="Nº cama, box..."></div>
+      <div class="fld"><label>Sala / Unidad</label>
+        <select id="fsala" onchange="fcheckSala()">
+          <option value="">— seleccionar —</option>
+          <option value="UCI 72">UCI 72 (Unidad de Cuidados Intensivos)</option>
+          <option value="CIM 61">CIM 61 (Sala)</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+      <div class="fld" id="fsala-otro-wrap" style="display:none;"><label>Especificar sala</label><input id="fsalaotro" value="" placeholder="Ej: CIM 62, guardia..."></div>
+
+    </div>
+  </div>
+
+  <div class="sec-box">
+    <div class="slbl">Motivo de internación</div>
+    <div class="fld"><textarea id="fmot" placeholder="Motivo principal, situación clínica actual...">${v('motivo')}</textarea></div>
+    <div class="fld" style="margin-top:7px;"><label>Pendientes</label>
+      <textarea id="fpend" placeholder="Un pendiente por línea: Ej: odontología, ginecología, nefro...">${v('pendientes')}</textarea>
+    </div>
+    <div class="fld" style="margin-top:7px;"><label>Problema actual</label>
+      <input id="fprob" value="${v('problema_actual')}" placeholder="Problema clínico principal activo">
+    </div>
+  </div>
+
+  <!-- PRE-TRASPLANTE -->
+  <div id="sec-pre" style="display:${isPre||isRetx?'block':'none'};">
+    <div class="sec-box">
+      <div class="slbl green">Pre-trasplante</div>
+      <div class="g4">
+        <div class="fld"><label>PELD</label><input id="fpeld" type="number" inputmode="decimal" value="${v('peld')}" placeholder="score"></div>
+        <div class="fld"><label>MELD</label><input id="fmeld" type="number" inputmode="decimal" value="${v('meld')}" placeholder="score"></div>
+        <div class="fld"><label>Estado en lista</label>
+          <select id="flista">${opt(['','Activo','Inactivo','No ingresado aún'],v('lista_estado'))}</select>
+        </div>
+        <div class="fld"><label>Fecha ingreso lista</label><input id="fflist" type="date" value="${v('fecha_lista')}"></div>
+        <div class="fld gc2"><label>Complicaciones cirrosis</label><input id="fcompcirrosis" value="${v('complic_cirrosis')}" placeholder="Encefalopatía, ascitis, HDA..."></div>
+        <div class="fld"><label>Talla (cm)</label><input id="ftalla" type="number" inputmode="decimal" value="${v('talla')}"></div>
+        <div class="fld"><label>PU (cm)</label><input id="fpu" type="number" inputmode="decimal" value="${v('pu')}"></div>
+      </div>
+      <div style="margin-top:10px;"><div class="slbl">Evaluaciones pre-trasplante</div>
+      <div class="eval-grid">
+        ${[['cardio','Cardiología'],['neumo','Neumología'],['nefro','Nefrología'],['infecto','Infectología'],['neuro','Neurología'],['orl','ORL'],['oftalmo','Oftalmología'],['salud_mental','Salud Mental'],['s_social','Servicio Social'],['alimentacion','Alimentación'],['gineco','Ginecología']].map(([k,lbl])=>`
+        <div class="eval-item"><label>${lbl}</label>
+          <select id="eval_${k}" onchange="this.className=this.value==='pendiente'?'pend':this.value==='apto'||this.value==='ok'?'apto':''">
+            ${['','apto','pendiente','no aplica'].map(o=>`<option value="${o}"${v('eval_'+k)===o?' selected':''}>${o||'—'}</option>`).join('')}
+          </select>
+        </div>`).join('')}
+      </div></div>
+      <div class="fld" style="margin-top:10px;"><label>DVR / Familiar</label><input id="fdvr" value="${v('dvr')}" placeholder="Donante vivo relacionado..."></div>
+    </div>
+  </div>
+
+  <!-- RE-TRASPLANTE -->
+  <div id="sec-retx" style="display:${isRetx?'block':'none'};">
+    <div class="sec-box">
+      <div class="slbl purple">Re-trasplante</div>
+      <div class="g2">
+        <div class="fld"><label>Causa fallo injerto previo</label><input id="fcausa" value="${v('causa_fallo')}" placeholder="Trombosis, rechazo crónico..."></div>
+        <div class="fld"><label>Fecha re-Tx</label><input id="fretxfecha" type="date" value="${v('fecha_retx')}"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POST-TRASPLANTE -->
+  <div id="sec-post" style="display:${isPost?'block':'none'};">
+    <div class="sec-box">
+      <div class="slbl blue">Datos del trasplante</div>
+      <div class="g4">
+        <div class="fld"><label>Fecha de trasplante</label><input id="fftx" type="date" value="${v('fecha_tx')}"></div>
+        <div class="fld"><label>Riesgo inmunológico</label>
+          <select id="friesgo"><option value="">—</option>${opt(['Bajo','Moderado','Alto (retx / DSA+ / sensibilizado)'],v('riesgo'))}</select>
+        </div>
+        <div class="fld"><label>PRA</label><input id="fpra" value="${v('pra')}" placeholder="%"></div>
+        <div class="fld"><label>DSA</label><input id="fdsa" value="${v('dsa')}" placeholder="Positivo / Negativo"></div>
+        <div class="fld"><label>Donante</label><select id="fdon"><option value="">—</option>${opt(['Cadavérico','Donante vivo','Split','Dominó'],v('donante'))}</select></div>
+        <div class="fld"><label>Tipo de injerto</label><select id="ftipoinj"><option value="">—</option>${opt(['Monosegmento','Segmento lateral izq','Lóbulo izquierdo','Lóbulo derecho','Órgano completo'],v('tipo_injerto'))}</select></div>
+        <div class="fld"><label>GRWR (%)</label><input id="fgrwr" value="${v('grwr')}" placeholder="0.8-4"></div>
+        <div class="fld"><label>Peso explante (g)</label><input id="fpexpl" type="number" inputmode="decimal" value="${v('peso_explante')}"></div>
+        <div class="fld"><label>Peso implante (g)</label><input id="fpimpl" type="number" inputmode="decimal" value="${v('peso_implante')}"></div>
+        <div class="fld"><label>TIF (hs)</label><input id="ftif" value="${v('tif')}" placeholder="3hs 30min"></div>
+        <div class="fld"><label>Piggy back</label><select id="fpiggy">${opt(['—','SI','NO'],v('piggy_back','—'))}</select></div>
+        <div class="fld"><label>Portoplastia</label><select id="fportop">${opt(['—','SI','NO'],v('portoplastia','—'))}</select></div>
+        <div class="fld"><label>Graft arterial</label><select id="fgraftart">${opt(['—','SI','NO'],v('graft_art','—'))}</select></div>
+        <div class="fld"><label>Graft venoso</label><select id="fgraftven">${opt(['—','SI','NO'],v('graft_ven','—'))}</select></div>
+        <div class="fld"><label>Vía biliar</label><input id="fviabil" value="${v('via_biliar')}" placeholder="1 BD, 2 BD, HY..."></div>
+        <div class="fld"><label>Cobertura</label><input id="fcob" value="${v('cobertura')}" placeholder="PAMI, OSDE, pública..."></div>
+        <div class="fld"><label>DVR / Familiar</label><input id="fdvr2" value="${v('dvr')}" placeholder="madre, padre..."></div>
+      </div>
+      <div style="margin-top:10px;"><div class="slbl">Inducción IS</div>
+        <div class="g4">
+          <div class="fld"><label>ATG (timoglobulina)</label><select id="fatg">${opt(['No','Sí — ciclo completo','Sí — ciclo parcial','Pendiente'],v('atg','No'))}</select></div>
+          <div class="fld"><label>Dosis ATG (mg/kg)</label><input id="fatgd" type="number" step="0.5" inputmode="decimal" value="${v('atg_d')}" placeholder="mg/kg"></div>
+          <div class="fld"><label>Basiliximab</label><select id="fbas">${opt(['No','Día 0 + Día 4','Solo día 0'],v('basili','No'))}</select></div>
+          <div class="fld"><label>Metilprednisolona IV</label><select id="fmp">${opt(['No','Intraoperatorio','Pulsos × 3 días','Descenso gradual IV'],v('mp','No'))}</select></div>
+        </div>
+      </div>
+      <div style="margin-top:10px;"><div class="slbl">Complicaciones post-Tx (cronológico)</div>
+        <div class="g2" style="margin-bottom:6px;">
+          <div class="fld"><label>Fecha</label><input id="fcompfecha" type="date"></div>
+          <div class="fld"><label>Descripción</label><input id="fcompdesc" placeholder="Ej: TAH, colangitis..."></div>
+        </div>
+        <button type="button" class="secondary" style="font-size:12px;padding:7px 12px;" onclick="addComp()">+ Agregar complicación</button>
+        <div id="fcomplist" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;">
+          ${compPost.map((c,j)=>`<span class="tg t-a">${fmtFecha(c.fecha)} — ${c.desc}<span class="tx" onclick="rmComp(${j})">×</span></span>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="sec-box">
+      <div class="slbl blue">IS de mantenimiento</div>
+      <div style="margin-bottom:8px;"><div class="slbl" style="font-size:10px;">Nivel FK actual</div>
+        <div class="g3">
+          <div class="fld"><label>Nivel valle (ng/mL)</label><input id="ftacro" type="number" step="0.1" inputmode="decimal" value="${v('tacro')}" placeholder="ng/mL"></div>
+          <div class="fld"><label>Objetivo FK (ng/mL)</label><input id="ftacroo" type="number" step="0.1" inputmode="decimal" value="${v('tacro_obj')}" placeholder="obj."></div>
+          <div class="fld"><label>Dosis FK</label><input id="ftacrodosis" value="${v('tacro_dosis')}" placeholder="mg/kg/d"></div>
+        </div>
+        <button type="button" class="secondary" style="font-size:12px;padding:7px 12px;margin-top:6px;" onclick="addFK()">+ Guardar nivel FK con fecha de hoy</button>
+        ${fkHist.length?`<div class="lab-hist" style="margin-top:6px;">
+          ${[...fkHist].reverse().slice(0,4).map(f=>`<div class="lab-hist-row"><span style="color:var(--text2);">${fmtFecha(f.fecha)}</span><span>${f.nivel} ng/mL · ${f.dosis||'—'}</span></div>`).join('')}
+        </div>`:''}
+      </div>
+      <div class="g4">
+        <div class="fld"><label>MMF</label><select id="fmmf">${opt(['No','Sí — dosis habitual','Dosis reducida','Suspendido'],v('mmf','No'))}</select></div>
+        <div class="fld"><label>Corticoides</label><select id="fcort">${opt(['No / suspendido','Mantenimiento','Pulso IV (rechazo)','En descenso'],v('cort','No / suspendido'))}</select></div>
+        <div class="fld"><label>mTOR</label><select id="fmtor">${opt(['No','Sirolimus','Everolimus'],v('mtor','No'))}</select></div>
+        <div class="fld gca"><label>Otros IS</label><div class="tw" id="fwi"><input id="fii" placeholder="Enter para agregar..." onkeydown="ftag(event,'i')"></div></div>
+      </div>
+    </div>
+    <div class="sec-box">
+      <div class="slbl blue">Complicaciones post-trasplante</div>
+      <div class="g4">
+        <div class="fld"><label>Rechazo</label><select id="frec">${opt(['No','Agudo leve','Agudo moderado','Agudo grave','Crónico / ductopénico','Humoral (AMR)'],v('rechazo','No'))}</select></div>
+        <div class="fld"><label>Comp. vascular</label><select id="fvas">${opt(['No','Trombosis arteria hepática','Trombosis portal','Estenosis arteria hepática','Estenosis portal'],v('vascular','No'))}</select></div>
+        <div class="fld"><label>Comp. biliar</label><select id="fbil">${opt(['No','Estenosis biliar','Fístula / bilioma','Colangitis'],v('biliar','No'))}</select></div>
+        <div class="fld"><label>Infección activa</label><select id="finf">${opt(['No','Bacteriana','CMV','EBV','Adenovirus','Viral (otro)','Fúngica','Múltiple'],v('infec','No'))}</select></div>
+        <div class="fld gc2"><label>PTLD</label><select id="fptld">${opt(['No','Sospecha','Confirmado — en tratamiento'],v('ptld','No'))}</select></div>
+        <div class="fld gc2"><label>Otras complicaciones</label><input id="fotras" value="${v('otras')}" placeholder="HTA, insuf. renal, neurotoxicidad FK..."></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LABORATORIO -->
+  <div class="sec-box">
+    <div class="slbl">Laboratorio — fecha de hoy (${fmtFecha(fechaHoy())})</div>
+    ${labHist.length?`<div style="font-size:11px;background:var(--post-bg);border:.5px solid var(--post-bd);color:var(--post);border-radius:var(--r);padding:5px 9px;margin-bottom:8px;">✓ ${labHist.length} registro(s) anteriores guardados. Al guardar, se agrega el de hoy sin borrar ninguno.</div>`:''}
+    <div class="g4">
+      ${[['fbili','Bili total (mg/dL)',v('bili')],['ftgo','TGO/AST (U/L)',v('tgo')],['ftgp','TGP/ALT (U/L)',v('tgp')],['fggt','GGT (U/L)',v('ggt')],['ftp','Quick/TP (%)',v('tp')],['finr','INR',v('inr')],['falb','Albúmina (g/dL)',v('alb')],['fcreat','Creatinina (mg/dL)',v('creat')]].map(([id,lbl,val])=>`<div class="fld"><label>${lbl}</label><input id="${id}" type="number" step="0.1" min="0" inputmode="decimal" value="${val}"></div>`).join('')}
+    </div>
+  </div>
+
+  <!-- ATB -->
+  <div class="sec-box">
+    <div class="slbl">ATB, antivirales, antifúngicos</div>
+    <div class="fld" style="margin-bottom:8px;"><label>Fecha inicio ATB</label><input id="ffatb" type="date" value="${v('fecha_inicio_atb')}"></div>
+    <div class="tw" id="fwa" style="margin-bottom:8px;"><input id="fia" placeholder="Fármaco + dosis — Enter para agregar..." onkeydown="ftag(event,'a')"></div>
+    <div class="g3">
+      <div class="fld"><label>Profilaxis CMV</label><select id="fpcmv">${opt(['No','Valganciclovir','Ganciclovir IV'],v('pcmv','No'))}</select></div>
+      <div class="fld"><label>Profilaxis PCP</label><select id="fppcp">${opt(['No','TMP-SMX','Pentamidina inhalada'],v('ppcp','No'))}</select></div>
+      <div class="fld"><label>Antifúngico profilaxis</label><select id="fpaf">${opt(['No','Fluconazol','Micafungina','Anfotericina B'],v('paf','No'))}</select></div>
+    </div>
+  </div>
+
+  <!-- CULTIVOS -->
+  <div class="sec-box">
+    <div class="slbl">Cultivos y cargas virales</div>
+    <div class="g3">
+      <div class="fld"><label>Muestra</label><input id="fcm" placeholder="Hemocultivo, carga CMV..."></div>
+      <div class="fld"><label>Resultado</label><select id="fcr"><option value="">—</option>${opt(['Pendiente','Negativo','Positivo','En descenso','En ascenso'],'')}</select></div>
+      <div class="fld"><label>Germen / valor</label><input id="fcg" placeholder="E. coli BLEE, 2500 cop/mL..."></div>
+    </div>
+    <button type="button" class="secondary" style="margin-top:8px;font-size:13px;" onclick="faddcult()">+ Agregar cultivo</button>
+    <div id="fcl" style="margin-top:7px;display:flex;flex-wrap:wrap;gap:4px;"></div>
+  </div>
+
+  <!-- ANTITROMBÓTICO -->
+  <div class="sec-box">
+    <div class="slbl">Tratamiento antitrombótico</div>
+    <div class="tw" id="fwt"><input id="fit" placeholder="Heparina, enoxaparina, AAS, dipiridamol... Enter" onkeydown="ftag(event,'t')"></div>
+  </div>
+
+  <!-- NUTRICIÓN -->
+  <div class="sec-box">
+    <div class="slbl">Nutrición y soporte</div>
+    <div class="g4">
+      <div class="fld"><label>Alimentación</label><select id="fnutri">${opt(['—','Oral','SNG / SND','NPT','NPT + SNG','Ayuno'],v('nutri','—'))}</select></div>
+      <div class="fld"><label>Diuresis (mL/kg/h)</label><input id="fdiur" type="number" step="0.1" inputmode="decimal" value="${v('diur')}" placeholder="mL/kg/h"></div>
+      <div class="fld"><label>Ventilación</label><select id="fvent">${opt(['Sin soporte','O2 cánula nasal','VNI (CPAP/BiPAP)','ARM'],v('vent','Sin soporte'))}</select></div>
+      <div class="fld"><label>Soporte hemodinámico</label><select id="fhemo">${opt(['No','Dopamina','Noradrenalina','Múltiples vasoactivos'],v('hemodi','No'))}</select></div>
+    </div>
+  </div>
+
+  <!-- PLAN -->
+  <div class="sec-box">
+    <div class="slbl">Plan del día / observaciones</div>
+    <div class="fld"><textarea id="fobs" placeholder="Plan, indicaciones, interconsultas, próximos estudios...">${v('obs')}</textarea></div>
+  </div>
+
+  <div class="form-actions">
+    <button class="primary" onclick="fguardar()">Guardar ↗</button>
+    <button class="secondary" onclick="swSala()">Cancelar</button>
+    ${EID?`<button class="danger" onclick="delPx(${EID})">Eliminar</button>`:''}
+  </div>`;
+
+  ['a','i','t'].forEach(t=>frtags(t));frcults();fctx();
+  // Restore comp post list
+  const compPostCurrent=p?p.complicaciones_post||[]:[];
+  compPostCurrent.forEach((_,j)=>{}); // already rendered above
+  const _salaVal=v('sala');
+  // Apply eval colors and sala
+  setTimeout(()=>{
+    const salaEl=document.getElementById('fsala');
+    if(salaEl&&_salaVal){
+      if(['UCI 72','CIM 61'].includes(_salaVal)){salaEl.value=_salaVal;}
+      else if(_salaVal){salaEl.value='otro';const ow=document.getElementById('fsala-otro-wrap');if(ow)ow.style.display='';const oi=document.getElementById('fsalaotro');if(oi)oi.value=_salaVal;}
+    }
+    [['cardio'],['neumo'],['nefro'],['infecto'],['neuro'],['orl'],['oftalmo'],['salud_mental'],['s_social'],['alimentacion'],['gineco']].forEach(([k])=>{
+      const el=document.getElementById('eval_'+k);
+      if(el)el.className=el.value==='pendiente'?'pend':el.value==='apto'||el.value==='ok'?'apto':'';
+    });
+  },100);
+}
+
+let _compPost=[];
+function addComp(){
+  const f=document.getElementById('fcompfecha')?.value;
+  const d=document.getElementById('fcompdesc')?.value.trim();
+  if(!d)return;
+  _compPost.push({fecha:f||fechaHoy(),desc:d});
+  document.getElementById('fcompdesc').value='';
+  renderCompPost();
+}
+function rmComp(j){_compPost.splice(j,1);renderCompPost();}
+function renderCompPost(){
+  const el=document.getElementById('fcomplist');if(!el)return;
+  el.innerHTML=_compPost.map((c,j)=>`<span class="tg t-a">${fmtFecha(c.fecha)} — ${c.desc}<span class="tx" onclick="rmComp(${j})">×</span></span>`).join('');
+}
+function addFK(){
+  const nivel=document.getElementById('ftacro')?.value;
+  const dosis=document.getElementById('ftacrodosis')?.value;
+  if(!nivel)return;
+  FKH.push({fecha:fechaHoy(),nivel,dosis:dosis||''});
+  const el=document.getElementById('ftacro');if(el)el.value='';
+  // refresh display
+  const hist=document.getElementById('ftacro')?.closest('.sec-box');
+  // just update the value shown
+}
+
+function fcheckSala(){
+  const v=document.getElementById('fsala')?.value;
+  const w=document.getElementById('fsala-otro-wrap');
+  if(w)w.style.display=v==='otro'?'':'none';
+}
+function fctx(){
+  const v=document.getElementById('fmo')?.value;if(!v)return;
+  const msgs={pre:'Pre-trasplante: paciente en lista o evaluación.',post_inmediato:'Post-Tx inmediato: inducción IS y monitoreo del injerto.',post_temprano:'Post-Tx temprano (2 sem–6 meses): vigilancia de rechazo e infecciones.',post_tardio:'Post-Tx tardío (>6 meses): función del injerto, complicaciones crónicas.',retx:'Re-trasplante: documentar causa de fallo del injerto previo.'};
+  const b=document.getElementById('fctxb');
+  if(b){
+    b.textContent=msgs[v]||'';
+    b.className='ctx-info '+(v==='pre'?'ctx-pre':v==='retx'?'ctx-retx':'ctx-post');
+    b.style.display=v?'':'none';
+  }
+  document.getElementById('sec-pre').style.display=(v==='pre'||v==='retx')?'block':'none';
+  document.getElementById('sec-retx').style.display=v==='retx'?'block':'none';
+  document.getElementById('sec-post').style.display=(v&&v!=='pre')?'block':'none';
+}
+
+function ftag(e,t){if(e.key!=='Enter')return;e.preventDefault();const i=document.getElementById('fi'+t);const val=i.value.trim();if(!val)return;FT[t].push(val);i.value='';frtags(t);}
+function frtags(t){const w=document.getElementById('fw'+t);const i=document.getElementById('fi'+t);if(!w||!i)return;w.querySelectorAll('.tg').forEach(x=>x.remove());const cls=t==='a'?'t-a':t==='t'?'t-t':'t-i';FT[t].forEach((v,j)=>{const d=document.createElement('div');d.className='tg '+cls;d.innerHTML=v+`<span class="tx" onclick="frmtag('${t}',${j})">×</span>`;w.insertBefore(d,i);});}
+function frmtag(t,j){FT[t].splice(j,1);frtags(t);}
+function faddcult(){const m=document.getElementById('fcm')?.value.trim();if(!m)return;const r=document.getElementById('fcr')?.value;const g=document.getElementById('fcg')?.value.trim();FC.push(m+(r?' — '+r:'')+(g?' ('+g+')':''));['fcm','fcg'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});const cr=document.getElementById('fcr');if(cr)cr.selectedIndex=0;frcults();}
+function frcults(){const el=document.getElementById('fcl');if(!el)return;el.innerHTML='';FC.forEach((c,j)=>{const d=document.createElement('div');d.className='tg t-c';d.innerHTML=c+`<span class="tx" onclick="frmcult(${j})">×</span>`;el.appendChild(d);});}
+function frmcult(j){FC.splice(j,1);frcults();}
+function fg(id){return document.getElementById(id)?.value?.trim()||'';}
+function fsel(id){return document.getElementById(id)?.value||'';}
+
+function fguardar(){
+  const nom=fg('fnom');if(!nom){document.getElementById('fnom')?.focus();return;}
+  const en=fg('fedad'),eu=fsel('fedadu'),mo=fsel('fmo');
+  const isPre=mo==='pre';
+  const isPost=mo&&mo!=='pre';
+  // Lab history — add today's values
+  const existingLabHist=EID?(PXS.find(x=>x.id===EID)?.lab_history||[]):[];
+  const newLab={fecha:fechaHoy(),bili:fg('fbili'),tgo:fg('ftgo'),tgp:fg('ftgp'),ggt:fg('fggt'),tp:fg('ftp'),inr:fg('finr'),alb:fg('falb'),creat:fg('fcreat')};
+  const hasNewLab=Object.values(newLab).slice(1).some(v=>v);
+  const labHistory=hasNewLab?[...existingLabHist,newLab]:existingLabHist;
+  // Comp post
+  const existingComp=EID?(PXS.find(x=>x.id===EID)?.complicaciones_post||[]):[];
+  const allComp=[...existingComp,..._compPost];
+  // FK history
+  const existingFK=EID?(PXS.find(x=>x.id===EID)?.fk_history||[]):[];
+  const fkHistory=[...existingFK,...FKH];
+  // current FK level
+  const tacroVal=fg('ftacro');
+  if(tacroVal&&!FKH.find(f=>f.fecha===fechaHoy())){
+    fkHistory.push({fecha:fechaHoy(),nivel:tacroVal,dosis:fg('ftacrodosis')});
+  }
+  // Evals
+  const evalKeys=['cardio','neumo','nefro','infecto','neuro','orl','oftalmo','salud_mental','s_social','alimentacion','gineco'];
+  const evals={};
+  evalKeys.forEach(k=>{evals['eval_'+k]=fsel('eval_'+k);});
+  const p={
+    id:EID||Date.now(),nombre:nom,
+    edad:(en?en+' '+eu:'—'),edad_n:en,edad_u:eu,
+    peso:fg('fpeso'),diag:fsel('fdiag'),enf_base:fg('fenf_base'),
+    hc:fg('fhc'),cirugia_previa:fg('fcirugia'),
+    nacionalidad:fg('fnac'),residencia:fg('fres'),
+    grupo_factor:fg('fgf'),
+    fecha_ingreso:fg('ffi'),lugar_int:fg('flugar'),
+    momento:mo,estado:fsel('fest'),
+    sala:fsel('fsala')==='otro'?fg('fsalaotro'):fsel('fsala'),
+
+    motivo:fg('fmot'),pendientes:fg('fpend'),problema_actual:fg('fprob'),
+    // Pre
+    peld:fg('fpeld'),meld:fg('fmeld'),lista_estado:fsel('flista'),fecha_lista:fg('fflist'),
+    complic_cirrosis:fg('fcompcirrosis'),talla:fg('ftalla'),pu:fg('fpu'),
+    dvr:fg('fdvr')||fg('fdvr2'),
+    ...evals,
+    // Retx
+    causa_fallo:fg('fcausa'),fecha_retx:fg('fretxfecha'),
+    // Post
+    fecha_tx:fg('fftx'),riesgo:fsel('friesgo'),pra:fg('fpra'),dsa:fg('fdsa'),
+    donante:fsel('fdon'),tipo_injerto:fsel('ftipoinj'),
+    grwr:fg('fgrwr'),peso_explante:fg('fpexpl'),peso_implante:fg('fpimpl'),
+    tif:fg('ftif'),piggy_back:fsel('fpiggy'),portoplastia:fsel('fportop'),
+    graft_art:fsel('fgraftart'),graft_ven:fsel('fgraftven'),
+    via_biliar:fg('fviabil'),cobertura:fg('fcob'),
+    mostrarInd:['post_inmediato','post_temprano','retx'].includes(mo),
+    atg:fsel('fatg'),atg_d:fg('fatgd'),basili:fsel('fbas'),mp:fsel('fmp'),
+    complicaciones_post:allComp,
+    tacro:fg('ftacro'),tacro_obj:fg('ftacroo'),tacro_dosis:fg('ftacrodosis'),
+    mmf:fsel('fmmf'),cort:fsel('fcort'),mtor:fsel('fmtor'),
+    is_extra:[...FT.i],
+    rechazo:fsel('frec'),vascular:fsel('fvas'),biliar:fsel('fbil'),
+    infec:fsel('finf'),ptld:fsel('fptld'),otras:fg('fotras'),
+    // Labs
+    bili:newLab.bili||fg('fbili'),tgo:newLab.tgo,tgp:newLab.tgp,ggt:newLab.ggt,
+    tp:newLab.tp,inr:newLab.inr,alb:newLab.alb,creat:newLab.creat,
+    lab_history:labHistory,
+    fk_history:fkHistory,
+    // ATB
+    fecha_inicio_atb:fg('ffatb'),
+    abx:[...FT.a],atb:[...FT.t],cults:[...FC],
+    pcmv:fsel('fpcmv'),ppcp:fsel('fppcp'),paf:fsel('fpaf'),
+    nutri:fsel('fnutri'),diur:fg('fdiur'),vent:fsel('fvent'),hemodi:fsel('fhemo'),
+    obs:fg('fobs'),ts:Date.now()
+  };
+  _compPost=[];FKH=[];
+  savePx(p);
+}
+
+// ---- SCORE ----
+function score(p){
+  const b=parseFloat(p.bili)||0,ir=parseFloat(p.inr)||0,tp=parseFloat(p.tp)||0,al=parseFloat(p.alb)||0,cr=parseFloat(p.creat)||0,tg=parseFloat(p.tgo)||0,dp=diasDesde(p.fecha_tx)||0;
+  let s=0;
+  if(b>3)s+=1;if(b>5)s+=2;if(b>10)s+=2;if(b>20)s+=3;
+  if(ir>1.5)s+=1;if(ir>2)s+=2;if(ir>3)s+=2;
+  if(tp>0&&tp<50)s+=2;if(al>0&&al<3)s+=1;if(cr>1)s+=1;if(cr>2)s+=2;
+  if(tg>500)s+=1;if(tg>1000)s+=2;
+  const r=p.rechazo||'';
+  if(r==='Agudo leve')s+=2;if(r==='Agudo moderado')s+=4;if(r==='Agudo grave'||r==='Humoral (AMR)')s+=7;if(r==='Crónico / ductopénico')s+=5;
+  if(p.vascular&&p.vascular!=='No')s+=6;if(p.biliar&&p.biliar!=='No')s+=3;
+  const inf=p.infec||'';if(inf==='Bacteriana')s+=2;if(['CMV','EBV','Adenovirus','Viral (otro)'].includes(inf))s+=3;if(inf==='Fúngica'||inf==='Múltiple')s+=5;
+  if(p.estado&&p.estado.includes('Inestable'))s+=3;if(p.estado&&p.estado.includes('Crítico'))s+=7;
+  const h=p.hemodi||'';if(h&&h!=='No')s+=(h==='Múltiples vasoactivos'?5:3);
+  let niv,cls,de;
+  if(s<=4){niv='Evolución favorable';cls='b-ok';de=Math.max(3,7-Math.floor(dp/5));}
+  else if(s<=10){niv='Complejidad moderada';cls='b-med';de=Math.max(7,21-Math.floor(dp/3));}
+  else if(s<=18){niv='Alta complejidad';cls='b-mal';de=Math.max(14,45-Math.floor(dp/2));}
+  else{niv='Crítico';cls='b-crit';de=null;}
+  return{s,niv,cls,de};
+}
+
+// ---- STORAGE ----
+function lsave(d){try{localStorage.setItem(SK,JSON.stringify(d));}catch(e){}}
+function lload(){try{const d=localStorage.getItem(SK);return d?JSON.parse(d):[];}catch(e){return[];}}
+function psave(d){try{localStorage.setItem(SK+'_p',JSON.stringify(d));}catch(e){}}
+function pload(){try{const d=localStorage.getItem(SK+'_p');return d?JSON.parse(d):[];}catch(e){return[];}}
+pending=pload();
+
+function obUpdate(){
+  const b=document.getElementById('ob');
+  if(!online){b.textContent='Sin conexión — los cambios se sincronizan al volver la señal.';b.className='offline-bar show';}
+  else if(pending.length){b.textContent=pending.length+' cambio(s) pendiente(s) de sincronizar.';b.className='offline-bar show';}
+  else{b.className='offline-bar';}
+}
+
+async function pull(){
+  try{
+    const r=await fetch(SU+'?action=list',{cache:'no-store'});
+    const d=await r.json();
+    if(d.pacientes){lsave(d.pacientes);PXS=d.pacientes;renderSala(d.pacientes);setSok();}
+  }catch(e){setSer();}
+}
+async function push(body){
+  const r=await fetch(SU,{method:'POST',body:JSON.stringify(body)});
+  return await r.json();
+}
+async function flush(){
+  if(!pending.length||!online)return;
+  const ops=[...pending];pending=[];psave([]);
+  for(const op of ops){try{await push(op);}catch(e){pending.push(op);psave(pending);}}
+  obUpdate();
+}
+async function savePx(p){
+  setSsy();
+  let data=lload();
+  if(EID)data=data.filter(x=>x.id!==EID);
+  data.push(p);lsave(data);PXS=data;EID=null;
+  renderSala(data);swSala();
+  if(online){try{await push({action:'save',paciente:p});setSok();await pull();}catch(e){pending.push({action:'save',paciente:p});psave(pending);obUpdate();setSer();}}
+  else{pending.push({action:'save',paciente:p});psave(pending);obUpdate();setSof();}
+}
+async function delPx(id){
+  if(!confirm('¿Eliminar este paciente?'))return;
+  setSsy();
+  let data=lload().filter(p=>p.id!==id);
+  lsave(data);PXS=data;renderSala(data);swSala();
+  if(online){try{await push({action:'delete',id});setSok();await pull();}catch(e){pending.push({action:'delete',id});psave(pending);obUpdate();}}
+  else{pending.push({action:'delete',id});psave(pending);obUpdate();}
+}
+async function darDeAlta(id){
+  const p=PXS.find(x=>x.id===id);
+  if(!p)return;
+  if(!confirm('¿Dar de alta a '+p.nombre+'?\nEl paciente se moverá al archivo de altas y no aparecerá más en el pase activo.'))return;
+  setSsy();
+  const pAlta={...p,alta:true,fecha_alta:fechaHoy()};
+  // Save to altas archive
+  try{const altas=JSON.parse(localStorage.getItem('pase_v7_altas')||'[]');altas.push(pAlta);localStorage.setItem('pase_v7_altas',JSON.stringify(altas));}catch(e){}
+  // Remove from active
+  let data=lload().filter(x=>x.id!==id);
+  lsave(data);PXS=data;renderSala(data);swSala();
+  if(online){
+    try{
+      await push({action:'delete',id});
+      await push({action:'save_alta',paciente:pAlta});
+      setSok();await pull();
+    }catch(e){pending.push({action:'delete',id});psave(pending);obUpdate();}
+  }else{pending.push({action:'delete',id});psave(pending);obUpdate();setSof();}
+}
+
+async function forceSync(){setTab('t-sync');setSsy();await flush();await pull();setTimeout(()=>setActiveIfSala(),600);}
+function setActiveIfSala(){if(document.getElementById('pnl-sala').style.display!=='none')setTab('t-sala');}
+function setSsy(){document.getElementById('sdot').className='sdot sy';document.getElementById('slbl').textContent='Sincronizando...';}
+function setSok(){document.getElementById('sdot').className='sdot';document.getElementById('slbl').textContent='OK '+new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});}
+function setSer(){document.getElementById('sdot').className='sdot er';document.getElementById('slbl').textContent='Error servidor';}
+function setSof(){document.getElementById('sdot').className='sdot of';document.getElementById('slbl').textContent='Sin conexión';}
+
+// ---- START ----
+const localData=lload();
+if(localData.length){PXS=localData;renderSala(localData);}else{renderSala([]);}
+if(online){flush().then(()=>pull());}else{setSof();obUpdate();}
+setInterval(()=>{if(online)pull();},15000);
+// Auto-refresh days every 60 seconds without full sync
+setInterval(()=>{if(PXS.length)renderSala(PXS);},60000);
+</script>
+</body>
+</html>
