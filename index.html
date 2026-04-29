@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pase de sala — Tx hepático pediátrico</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;background:#f1efe8;color:#1a1a1a;}
+.app{max-width:900px;margin:0 auto;background:#fff;min-height:100vh;}
+.hdr{padding:.8rem 1rem;border-bottom:1px solid #e0e0e0;display:flex;align-items:center;justify-content:space-between;background:#fff;position:sticky;top:0;z-index:10;}
+.hdr h1{font-size:13px;font-weight:700;}
+.hdr p{font-size:10px;color:#666;margin-top:1px;}
+.sdot{width:8px;height:8px;border-radius:50%;background:#27a;display:inline-block;margin-right:4px;}
+.slbl{font-size:11px;color:#666;}
+.tabs{display:flex;border-bottom:1px solid #e0e0e0;background:#fff;}
+.tab{flex:1;padding:.7rem;font-size:12px;text-align:center;cursor:pointer;color:#888;border:none;background:transparent;font-family:inherit;font-weight:500;}
+.tab.on{color:#185FA5;border-bottom:2px solid #185FA5;}
+.content{padding:.9rem 1rem;}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem;}
+.stat{background:#f8f7f5;border-radius:8px;padding:.7rem;border:1px solid #e8e8e8;text-align:center;}
+.stat-n{font-size:22px;font-weight:700;}
+.stat-l{font-size:10px;color:#888;margin-top:2px;}
+.loc-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;}
+.loc{flex:1;min-width:100px;border-radius:8px;padding:.6rem .8rem;border:1px solid #e0e0e0;}
+.loc-uci{background:#FCEBEB;border-color:#F7C1C1;}
+.loc-cim{background:#EAF3DE;border-color:#C0DD97;}
+.loc-otro{background:#f8f7f5;}
+.loc-n{font-size:18px;font-weight:700;}
+.loc-uci .loc-n{color:#791F1F;}
+.loc-cim .loc-n{color:#27500A;}
+.loc-l{font-size:11px;font-weight:700;margin-top:1px;}
+.loc-uci .loc-l{color:#791F1F;}
+.loc-cim .loc-l{color:#27500A;}
+.loc-l2{font-size:10px;color:#888;margin-top:2px;}
+
+/* CARDS */
+.card{border-radius:10px;border:1px solid #e0e0e0;background:#fff;margin-bottom:8px;cursor:pointer;overflow:hidden;}
+.card:hover{border-color:#aaa;}
+.card-top{display:flex;gap:8px;padding:10px 11px 8px;}
+.strip{width:4px;border-radius:2px;min-height:50px;flex-shrink:0;}
+.s-pre{background:#185FA5;}.s-post{background:#27500A;}.s-retx{background:#3C3489;}
+.cname{font-weight:700;font-size:14px;}
+.csub{font-size:11px;color:#666;margin-top:2px;line-height:1.4;}
+.cbrow{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;}
+.cb{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;}
+.cb-pre{background:#E6F1FB;color:#185FA5;}
+.cb-post{background:#EAF3DE;color:#27500A;}
+.cb-retx{background:#EEEDFE;color:#3C3489;}
+.cb-gray{background:#f0f0f0;color:#666;}
+.cb-ok{background:#EAF3DE;color:#27500A;}
+.cb-mal{background:#FCEBEB;color:#791F1F;}
+.card-labs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:6px 11px;background:#f8f7f5;border-top:1px solid #e8e8e8;}
+.lbl{font-size:10px;color:#888;}.lbv{font-size:12px;font-weight:700;}
+.card-dias{padding:5px 11px;border-top:1px solid #e8e8e8;background:#f8f7f5;font-size:10px;color:#666;display:flex;gap:10px;flex-wrap:wrap;}
+.card-dias strong{color:#185FA5;}
+.card-pend{padding:5px 11px;border-top:1px solid #FAC775;background:#FAEEDA;font-size:10px;color:#854F0B;font-weight:600;}
+.card-alert{padding:5px 11px;border-top:1px solid #F7C1C1;background:#FCEBEB;font-size:10px;color:#791F1F;font-weight:600;}
+.add-btn{width:100%;padding:.8rem;border:1px dashed #ccc;border-radius:10px;background:transparent;color:#888;font-size:13px;font-family:inherit;cursor:pointer;margin-top:4px;}
+
+/* FORM */
+.sec-box{background:#f8f7f5;border-radius:10px;padding:.8rem;border:1px solid #e8e8e8;margin-bottom:.8rem;}
+.sec-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#888;margin-bottom:8px;}
+.sec-lbl.green{color:#27500A;background:#EAF3DE;padding:3px 9px;border-radius:20px;display:inline-block;}
+.sec-lbl.blue{color:#185FA5;background:#E6F1FB;padding:3px 9px;border-radius:20px;display:inline-block;}
+.sec-lbl.purple{color:#3C3489;background:#EEEDFE;padding:3px 9px;border-radius:20px;display:inline-block;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+.g4{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+@media(min-width:600px){.g4{grid-template-columns:1fr 1fr 1fr 1fr;}}
+.gc2{grid-column:span 2;}.gca{grid-column:1/-1;}
+.fld{display:flex;flex-direction:column;gap:3px;}
+.fld label{font-size:11px;color:#666;font-weight:500;}
+.fld input,.fld select,.fld textarea{font-size:14px;padding:8px 10px;border:1px solid #ddd;border-radius:7px;background:#fff;color:#1a1a1a;font-family:inherit;width:100%;}
+.fld textarea{resize:vertical;min-height:60px;line-height:1.5;}
+.fld input:focus,.fld select:focus,.fld textarea:focus{outline:none;border-color:#185FA5;}
+.ar{display:flex;gap:4px;}.ar input{flex:2;}.ar select{flex:1;min-width:0;}
+.ctx-box{border-radius:7px;padding:7px 10px;font-size:12px;margin-bottom:8px;line-height:1.5;}
+.ctx-pre{background:#E6F1FB;color:#185FA5;}
+.ctx-post{background:#EAF3DE;color:#27500A;}
+.ctx-retx{background:#EEEDFE;color:#3C3489;}
+.eval-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+@media(min-width:500px){.eval-grid{grid-template-columns:repeat(3,1fr);}}
+.eval-item label{font-size:11px;color:#666;}
+.eval-item select{font-size:13px;padding:6px 8px;border:1px solid #ddd;border-radius:7px;background:#fff;width:100%;}
+.eval-item select.pend{border-color:#FAC775;background:#FAEEDA;color:#854F0B;}
+.eval-item select.apto{border-color:#C0DD97;background:#EAF3DE;color:#27500A;}
+.tw{display:flex;flex-wrap:wrap;gap:4px;padding:6px 8px;border:1px solid #ddd;border-radius:7px;background:#fff;min-height:40px;align-items:center;}
+.tw input{border:none;outline:none;font-size:13px;background:transparent;min-width:80px;flex:1;padding:0;}
+.tg{display:inline-flex;align-items:center;gap:3px;border-radius:20px;padding:3px 8px;font-size:11px;}
+.t-a{background:#E6F1FB;color:#0C447C;}.t-i{background:#FAEEDA;color:#633806;}.t-t{background:#EAF3DE;color:#27500A;}.t-c{background:#EEEDFE;color:#3C3489;}
+.tx{cursor:pointer;opacity:.5;font-size:13px;padding:0 2px;}.tx:hover{opacity:1;}
+.lab-hist{background:#f0f0f0;border-radius:7px;padding:7px 10px;font-size:11px;margin-top:6px;}
+.lhr{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #e0e0e0;font-size:11px;}
+.lhr:last-child{border-bottom:none;}
+.peld-row{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;}
+.peld-card{text-align:center;background:#E6F1FB;border-radius:8px;padding:8px 14px;border:1px solid #B5D4F4;}
+.peld-n{font-size:22px;font-weight:700;color:#185FA5;}
+.peld-l{font-size:10px;color:#666;margin-top:1px;}
+.fk-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:6px;}
+.fk-table th{background:#f0f0f0;padding:5px 7px;border:1px solid #e0e0e0;font-size:10px;color:#666;}
+.fk-table td{padding:5px 7px;border:1px solid #e0e0e0;text-align:center;}
+.sbox{background:#f8f7f5;border-radius:7px;padding:8px 11px;font-size:12px;color:#666;border:1px solid #e0e0e0;margin-top:8px;}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;}
+.b-ok{background:#EAF3DE;color:#27500A;}.b-med{background:#FAEEDA;color:#854F0B;}.b-mal{background:#FCEBEB;color:#791F1F;}
+
+/* BUTTONS */
+.btn-pri{background:#185FA5;color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;}
+.btn-pri:active{opacity:.85;}
+.btn-sec{background:#fff;color:#1a1a1a;border:1px solid #ccc;border-radius:8px;padding:10px 15px;font-size:14px;font-family:inherit;cursor:pointer;}
+.btn-sec:hover{background:#f5f5f5;}
+.btn-alta{background:#27500A;color:#fff;border:none;border-radius:8px;padding:10px 15px;font-size:14px;font-family:inherit;cursor:pointer;margin-left:auto;}
+.btn-del{background:#fff;color:#791F1F;border:1px solid #F7C1C1;border-radius:8px;padding:10px 15px;font-size:14px;font-family:inherit;cursor:pointer;}
+.form-actions{display:flex;gap:8px;padding-bottom:1.5rem;flex-wrap:wrap;margin-top:.5rem;}
+
+/* DETAIL */
+.det-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.8rem;gap:8px;}
+.det-name{font-size:17px;font-weight:700;}
+.det-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;}
+.det-back{background:#fff;border:1px solid #ccc;border-radius:8px;padding:7px 12px;font-size:13px;font-family:inherit;cursor:pointer;white-space:nowrap;}
+.det-sec{margin-bottom:.8rem;}
+.det-slbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#888;margin-bottom:7px;}
+.det-row{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid #f0f0f0;font-size:13px;}
+.det-row:last-child{border-bottom:none;}
+.det-l{color:#888;min-width:130px;flex-shrink:0;font-size:12px;}
+.det-v{flex:1;line-height:1.5;}
+.det-v.pend{color:#854F0B;font-weight:600;}
+.labgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:5px;}
+.labcard{background:#f8f7f5;border-radius:7px;padding:7px 9px;border:1px solid #e8e8e8;}
+.labcard-l{font-size:10px;color:#888;}
+.labcard-v{font-size:14px;font-weight:700;margin-top:2px;}
+.labcard-u{font-size:10px;font-weight:400;color:#888;}
+.pillrow{display:flex;flex-wrap:wrap;gap:4px;}
+.pend-banner{background:#FAEEDA;border:1px solid #FAC775;border-radius:8px;padding:8px 12px;margin-bottom:.8rem;font-size:12px;color:#854F0B;font-weight:600;}
+.offline-bar{background:#FAEEDA;border-bottom:1px solid #FAC775;padding:5px 1rem;font-size:11px;color:#633806;display:none;}
+.offline-bar.show{display:block;}
+
+.login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f1efe8;padding:1rem;}
+.login-card{background:#fff;border-radius:12px;border:1px solid #e0e0e0;padding:2rem;width:100%;max-width:360px;}
+.login-logo{text-align:center;margin-bottom:1.5rem;}
+.login-logo h1{font-size:16px;font-weight:700;color:#1a1a1a;margin-top:.5rem;}
+.login-logo p{font-size:12px;color:#888;margin-top:3px;}
+.login-field{margin-bottom:1rem;}
+.login-field label{font-size:12px;color:#666;font-weight:500;display:block;margin-bottom:5px;}
+.login-field input{width:100%;font-size:15px;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-family:inherit;color:#1a1a1a;}
+.login-field input:focus{outline:none;border-color:#185FA5;}
+.login-btn{width:100%;background:#185FA5;color:#fff;border:none;border-radius:8px;padding:12px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:.5rem;}
+.login-btn:active{opacity:.85;}
+.login-error{background:#FCEBEB;border:1px solid #F7C1C1;border-radius:7px;padding:8px 12px;font-size:12px;color:#791F1F;margin-top:.75rem;display:none;}
+.login-error.show{display:block;}
+.guia-btn{background:#fff;border:1px solid #ddd;border-radius:8px;padding:.75rem 1rem;font-size:13px;font-family:inherit;cursor:pointer;text-align:left;font-weight:500;color:#185FA5;}
+.guia-btn:hover{background:#E6F1FB;border-color:#B5D4F4;}
+.proto-box{background:#f8f7f5;border-radius:8px;padding:10px 12px;margin-bottom:8px;border:1px solid #e8e8e8;font-size:13px;line-height:1.7;}
+.proto-box.warning{background:#FAEEDA;border-color:#FAC775;}
+.proto-box.danger{background:#FCEBEB;border-color:#F7C1C1;}
+.proto-box.ok{background:#EAF3DE;border-color:#C0DD97;}
+.proto-h{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:6px;margin-top:10px;}
+.drug-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px;}
+.drug-table th{background:#f0f0f0;padding:5px 8px;border:1px solid #e0e0e0;font-size:11px;color:#666;text-align:left;}
+.drug-table td{padding:5px 8px;border:1px solid #e0e0e0;vertical-align:top;}
+.drug-table tr:nth-child(even) td{background:#f8f7f5;}
+</style>
+</head>
+<body>
+
+<div id="login-screen" class="login-screen">
+  <div class="login-card">
+    <div class="login-logo">
+      <div style="font-size:36px;">🏥</div>
+      <h1>Pase de sala</h1>
+      <p>Trasplante hepático pediátrico</p>
+    </div>
+    <div class="login-field">
+      <label>Usuario</label>
+      <input type="text" id="login-user" placeholder="Usuario" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="login-field">
+      <label>Contraseña</label>
+      <input type="password" id="login-pass" placeholder="Contraseña" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Ingresar</button>
+    <div class="login-error" id="login-error">Usuario o contraseña incorrectos.</div>
+  </div>
+</div>
+
+<div class="app" id="main-app" style="display:none;">
+<div class="offline-bar" id="ob"></div>
+<div class="hdr">
+  <div><h1>Pase de sala — Tx hepático pediátrico</h1><p id="fhdr"></p></div>
+  <div><span class="sdot" id="sdot" style="background:#aaa;"></span><span id="slbl" class="slbl">...</span></div>
+</div>
+<div class="tabs">
+  <button class="tab on" id="t-sala" onclick="showSala()">🏥 Sala</button>
+  <button class="tab" id="t-nuevo" onclick="showForm(null)">＋ Nuevo</button>
+  <button class="tab" id="t-guia" onclick="showGuia()">📋 Guía</button>
+<button class="tab" id="t-sync" onclick="forceSync()">↻ Sync</button>
+</div>
+<div id="pnl-sala" class="content">
+  <div class="stats" style="grid-template-columns:repeat(4,1fr);">
+    <div class="stat"><div class="stat-n" id="st0">0</div><div class="stat-l">Total</div></div>
+    <div class="stat" style="border-color:#B5D4F4;"><div class="stat-n" style="color:#185FA5;" id="st1">0</div><div class="stat-l">Pre-Tx</div></div>
+    <div class="stat" style="border-color:#C0DD97;"><div class="stat-n" style="color:#27500A;" id="st2">0</div><div class="stat-l">Post-Tx</div></div>
+    <div class="stat" style="border-color:#CECBF6;"><div class="stat-n" style="color:#3C3489;" id="st3">0</div><div class="stat-l">Re-Tx</div></div>
+  </div>
+  <div class="loc-row" id="loc-row"></div>
+  <div id="cards"></div>
+  <button class="add-btn" onclick="showForm(null)">+ Agregar paciente</button>
+</div>
+<div id="pnl-det" class="content" style="display:none;"><div id="det-inner"></div></div>
+<div id="pnl-form" class="content" style="display:none;"><div id="form-inner"></div></div>
+<div id="pnl-guia" class="content" style="display:none;">
+  <div style="font-size:15px;font-weight:700;margin-bottom:.9rem;">Consulta rápida — Protocolos Garrahan</div>
+  <div id="guia-menu" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem;">
+    <button class="guia-btn" onclick="showProtocolo('ramct')">Rechazo agudo (RAMCT)</button>
+    <button class="guia-btn" onclick="showProtocolo('tah')">Trombosis arteria hepática</button>
+    <button class="guia-btn" onclick="showProtocolo('tpp')">Trombosis portal</button>
+    <button class="guia-btn" onclick="showProtocolo('cmv')">Infección CMV</button>
+    <button class="guia-btn" onclick="showProtocolo('ptld')">PTLD / Linfoproliferativo</button>
+    <button class="guia-btn" onclick="showProtocolo('biliar')">Complicaciones biliares</button>
+    <button class="guia-btn" onclick="showProtocolo('profilaxis')">Profilaxis post-Tx</button>
+    <button class="guia-btn" onclick="showProtocolo('alarma')">Signos de alarma 72hs</button>
+    <button class="guia-btn" onclick="showProtocolo('is')">IS — dosis y niveles</button>
+    <button class="guia-btn" onclick="showProtocolo('peld')">PELD / MELD</button>
+  </div>
+  <div id="guia-content" style="display:none;">
+    <button class="btn-sec" style="margin-bottom:.9rem;font-size:12px;" onclick="document.getElementById('guia-content').style.display='none';document.getElementById('guia-menu').style.display='grid';">← Volver al menú</button>
+    <div id="guia-inner"></div>
+  </div>
+</div>
+
+</div>
+
+<script>
+var SU='https://script.google.com/macros/s/AKfycbywMhRbg3_ddatC14sjjZmPR1-GXnrSjoZNH_YA3g7xY4T_W7FzxfIbxXkitYSrNkXlIQ/exec';
+var SK='pase_v8';
+var PXS=[], EID=null, FT={a:[],i:[],t:[]}, FC=[], FKH=[], COMP=[];
+var online=navigator.onLine, pending=[];
+
+document.getElementById('fhdr').textContent=new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
+window.addEventListener('online',function(){online=true;obUpdate();flush(function(){pull();});});
+window.addEventListener('offline',function(){online=false;obUpdate();dot('of');});
+
+function dias(fecha){
+  if(!fecha)return null;
+  var d=new Date(fecha),h=new Date();
+  h.setHours(0,0,0,0);d.setHours(0,0,0,0);
+  return Math.floor((h-d)/86400000);
+}
+function hoy(){return new Date().toISOString().split('T')[0];}
+function fmtF(f){if(!f)return'—';var p=f.split('-');return p[2]+'/'+p[1]+'/'+p[0];}
+
+// NAV
+function showSala(){
+  document.getElementById('pnl-sala').style.display='';
+  document.getElementById('pnl-det').style.display='none';
+  document.getElementById('pnl-form').style.display='none';
+  document.getElementById('pnl-guia').style.display='none';
+  setTab('t-sala');
+  window.scrollTo(0,0);
+}
+function showDet(id){
+  var p=PXS.find(function(x){return x.id===id;});
+  if(!p)return;
+  document.getElementById('pnl-sala').style.display='none';
+  document.getElementById('pnl-det').style.display='';
+  document.getElementById('pnl-form').style.display='none';
+  setTab('');
+  renderDet(p);
+  window.scrollTo(0,0);
+}
+function showForm(p){
+  EID=p?p.id:null;
+  FT={a:(p?p.abx||[]:[]).slice(),i:(p?p.is_extra||[]:[]).slice(),t:(p?p.atb||[]:[]).slice()};
+  FC=(p?p.cults||[]:[]).slice();
+  FKH=(p?p.fk_history||[]:[]).slice();
+  COMP=(p?p.complicaciones_post||[]:[]).slice();
+  document.getElementById('pnl-sala').style.display='none';
+  document.getElementById('pnl-det').style.display='none';
+  document.getElementById('pnl-guia').style.display='none';
+  document.getElementById('pnl-form').style.display='';
+  setTab('t-nuevo');
+  buildForm(p);
+  window.scrollTo(0,0);
+}
+function setTab(on){
+  ['t-sala','t-nuevo','t-sync'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.className='tab'+(id===on?' on':'');
+  });
+}
+
+// SALA
+function getTipo(p){
+  if(p.momento==='retx')return'retx';
+  if(p.momento==='pre')return'pre';
+  return'post';
+}
+function getTipoLabel(p){
+  var t=getTipo(p);
+  if(t==='pre')return'Pre-trasplante';
+  if(t==='retx')return'Re-trasplante';
+  var m={post_inmediato:'Post-Tx inmediato',post_temprano:'Post-Tx temprano',post_tardio:'Post-Tx tardío (>6m)'};
+  return m[p.momento]||'Post-Tx';
+}
+function getPends(p){
+  var out=[];
+  if(p.momento==='pre'||p.momento==='retx'){
+    var evals=['cardio','neumo','nefro','infecto','neuro','orl','oftalmo','salud_mental','s_social','alimentacion','gineco'];
+    evals.forEach(function(e){if(p['eval_'+e]==='pendiente')out.push(e.replace('_',' '));});
+  }
+  if(p.pendientes){p.pendientes.split('\n').forEach(function(l){if(l.trim())out.push(l.trim());});}
+  return out;
+}
+
+function renderSala(pxs){
+  document.getElementById('st0').textContent=pxs.length;
+  document.getElementById('st1').textContent=pxs.filter(function(p){return p.momento==='pre';}).length;
+  document.getElementById('st2').textContent=pxs.filter(function(p){return p.momento&&p.momento!=='pre'&&p.momento!=='retx';}).length;
+  document.getElementById('st3').textContent=pxs.filter(function(p){return p.momento==='retx';}).length;
+
+  var uci=pxs.filter(function(p){return p.sala&&p.sala.toLowerCase().indexOf('uci')>=0;});
+  var cim=pxs.filter(function(p){return p.sala&&p.sala.toLowerCase().indexOf('cim')>=0;});
+  var otros=pxs.filter(function(p){return p.sala&&p.sala.toLowerCase().indexOf('uci')<0&&p.sala.toLowerCase().indexOf('cim')<0;});
+  var locHtml='';
+  if(uci.length)locHtml+='<div class="loc loc-uci"><div class="loc-n">'+uci.length+'</div><div class="loc-l">UCI</div><div class="loc-l2">'+uci.map(function(p){return p.nombre.split(',')[0];}).join(', ')+'</div></div>';
+  if(cim.length)locHtml+='<div class="loc loc-cim"><div class="loc-n">'+cim.length+'</div><div class="loc-l">CIM</div><div class="loc-l2">'+cim.map(function(p){return p.nombre.split(',')[0];}).join(', ')+'</div></div>';
+  otros.forEach(function(p){locHtml+='<div class="loc loc-otro"><div class="loc-n">1</div><div class="loc-l">'+p.sala+'</div><div class="loc-l2">'+p.nombre.split(',')[0]+'</div></div>';});
+  document.getElementById('loc-row').innerHTML=locHtml;
+
+  if(!pxs.length){document.getElementById('cards').innerHTML='<div style="text-align:center;padding:2rem;color:#888;">No hay pacientes. Tocá + Nuevo para agregar.</div>';return;}
+
+  var tipoCls={pre:'s-pre',post:'s-post',retx:'s-retx'};
+  var cbCls={pre:'cb-pre',post:'cb-post',retx:'cb-retx'};
+  var html='';
+  pxs.forEach(function(p){
+    var t=getTipo(p);
+    var di=dias(p.fecha_ingreso);
+    var dp=t!=='pre'?dias(p.fecha_tx):null;
+    var da=p.fecha_inicio_atb?dias(p.fecha_inicio_atb):null;
+    var pends=getPends(p);
+    var alerts=[];
+    if(p.vascular&&p.vascular!=='No')alerts.push('Comp. vascular');
+    if(p.rechazo&&p.rechazo!=='No')alerts.push('Rechazo: '+p.rechazo);
+    if(p.ptld&&p.ptld!=='No')alerts.push('PTLD');
+    html+='<div class="card" onclick="showDet('+p.id+')">';
+    html+='<div class="card-top"><div class="strip '+tipoCls[t]+'"></div><div style="flex:1;min-width:0;">';
+    html+='<div class="cname">'+p.nombre+'</div>';
+    html+='<div class="csub">'+(p.edad||'')+(p.peso?' · '+p.peso+' kg':'')+' · '+(p.diag||'—')+'</div>';
+    if(p.sala)html+='<div class="csub" style="font-weight:600;">'+(p.sala)+(p.lugar_int?' — Cama '+p.lugar_int:'')+'</div>';
+    html+='<div class="cbrow"><span class="cb '+cbCls[t]+'">'+getTipoLabel(p)+'</span>';
+    if(p.estado)html+='<span class="cb cb-gray">'+p.estado+'</span>';
+    if(p.lista_estado)html+='<span class="cb '+(p.lista_estado==='Activo'?'cb-ok':'cb-gray')+'">'+p.lista_estado+'</span>';
+    html+='</div></div></div>';
+    html+='<div class="card-labs">';
+    [['Bili',p.bili],['INR',p.inr],['TGO',p.tgo],['Cr',p.creat]].forEach(function(x){
+      html+='<div><div class="lbl">'+x[0]+'</div><div class="lbv">'+(x[1]||'—')+'</div></div>';
+    });
+    html+='</div>';
+    if(di!==null||dp!==null||da!==null||p.peld){
+      html+='<div class="card-dias">';
+      if(di!==null)html+='Internado <strong>'+di+'d</strong> ';
+      if(dp!==null)html+='Post-Tx <strong>'+dp+'d</strong> ';
+      if(da!==null)html+='ATB <strong>'+da+'d</strong> ';
+      if(p.peld)html+='PELD <strong>'+p.peld+'</strong>';
+      html+='</div>';
+    }
+    if(pends.length)html+='<div class="card-pend">⚠ Pendiente: '+pends.slice(0,3).join(' · ')+(pends.length>3?' +más':'')+'</div>';
+    if(alerts.length)html+='<div class="card-alert">⚑ '+alerts.join(' · ')+'</div>';
+    html+='</div>';
+  });
+  document.getElementById('cards').innerHTML=html;
+}
+
+// DETAIL
+function renderDet(p){
+  var t=getTipo(p);
+  var cbCls={pre:'cb-pre',post:'cb-post',retx:'cb-retx'}[t];
+  var pends=getPends(p);
+  var di=dias(p.fecha_ingreso);
+  var dp=t!=='pre'?dias(p.fecha_tx):null;
+  var da=p.fecha_inicio_atb?dias(p.fecha_inicio_atb):null;
+  var labHist=p.lab_history||[];
+  var labAct=labHist.length?labHist[labHist.length-1]:null;
+  var fkHist=p.fk_history||[];
+  var sc=score(p);
+  var pp=function(arr,cls){return arr&&arr.length?'<div class="pillrow">'+arr.map(function(v){return'<span class="tg '+cls+'">'+v+'</span>';}).join('')+'</div>':'<span style="color:#888">—</span>';};
+  var rw=function(l,v,isPend){return(v&&v!=='No'&&v!=='—'&&v!=='')?'<div class="det-row"><span class="det-l">'+l+'</span><span class="det-v'+(isPend?' pend':'')+'">'+v+'</span></div>':'';};
+
+  var h='';
+  h+='<div class="det-hdr"><div><div class="det-name">'+p.nombre+'</div><div class="det-badges">';
+  h+='<span class="cb '+cbCls+'">'+getTipoLabel(p)+'</span>';
+  if(p.estado)h+='<span class="cb cb-gray">'+p.estado+'</span>';
+  if(p.lista_estado)h+='<span class="cb '+(p.lista_estado==='Activo'?'cb-ok':'cb-gray')+'">'+p.lista_estado+'</span>';
+  h+='</div></div><button class="det-back" onclick="showSala()">← Sala</button></div>';
+  if(pends.length)h+='<div class="pend-banner">⚠ Pendientes: '+pends.join(' · ')+'</div>';
+
+  h+='<div class="det-sec"><div class="det-slbl">Datos</div>';
+  h+=rw('Edad / Peso',(p.edad||'—')+' · '+(p.peso||'—')+' kg');
+  h+=rw('Diagnóstico / Enf. base',(p.diag||'—')+(p.enf_base?' — '+p.enf_base:''));
+  h+=rw('HC',p.hc);h+=rw('Cirugía previa',p.cirugia_previa);
+  h+=rw('Sala',p.sala+(p.lugar_int?' — Cama '+p.lugar_int:''));
+  h+=rw('Internación',fmtF(p.fecha_ingreso)+(di!==null?' ('+di+' días)':''));
+  h+='</div>';
+
+  h+='<div class="det-sec"><div class="det-slbl">Motivo de internación</div>';
+  h+='<div style="font-size:13px;line-height:1.7;white-space:pre-wrap;">'+(p.motivo||'—')+'</div></div>';
+
+  if(t==='pre'||t==='retx'){
+    h+='<div class="det-sec"><div class="det-slbl" style="color:#27500A;background:#EAF3DE;padding:3px 9px;border-radius:20px;display:inline-block;margin-bottom:8px;">Pre-trasplante</div>';
+    if(p.peld||p.meld){
+      h+='<div class="peld-row">';
+      if(p.peld)h+='<div class="peld-card"><div class="peld-n">'+p.peld+'</div><div class="peld-l">PELD</div></div>';
+      if(p.meld)h+='<div class="peld-card"><div class="peld-n">'+p.meld+'</div><div class="peld-l">MELD</div></div>';
+      if(p.lista_estado)h+='<div class="peld-card"><div class="peld-n" style="font-size:15px;">'+p.lista_estado+'</div><div class="peld-l">Lista desde '+fmtF(p.fecha_lista)+'</div></div>';
+      h+='</div>';
+    }
+    h+=rw('Complicaciones cirrosis',p.complic_cirrosis);
+    var evalItems=[['cardio','Cardiología'],['neumo','Neumología'],['nefro','Nefrología'],['infecto','Infectología'],['neuro','Neurología'],['orl','ORL'],['oftalmo','Oftalmología'],['salud_mental','Salud Mental'],['s_social','Serv. Social'],['alimentacion','Alimentación'],['gineco','Ginecología']];
+    var pendEvals=evalItems.filter(function(x){return p['eval_'+x[0]]==='pendiente';});
+    var aptoEvals=evalItems.filter(function(x){return p['eval_'+x[0]]==='apto';});
+    if(pendEvals.length)h+='<div class="det-row"><span class="det-l">Pendientes</span><span class="det-v pend">'+pendEvals.map(function(x){return x[1];}).join(', ')+'</span></div>';
+    if(aptoEvals.length)h+='<div class="det-row"><span class="det-l">Aptos</span><span class="det-v" style="color:#27500A;">'+aptoEvals.map(function(x){return x[1];}).join(', ')+'</span></div>';
+    if(p.problema_actual)h+='<div class="det-row"><span class="det-l">Problema actual</span><span class="det-v pend">'+p.problema_actual+'</span></div>';
+    h+='</div>';
+  }
+
+  if(t!=='pre'){
+    h+='<div class="det-sec"><div class="det-slbl" style="color:#185FA5;background:#E6F1FB;padding:3px 9px;border-radius:20px;display:inline-block;margin-bottom:8px;">Post-trasplante</div>';
+    h+=rw('Fecha Tx',fmtF(p.fecha_tx)+(dp!==null?' (día '+dp+')':''));
+    h+=rw('Donante / Injerto',(p.donante||'—')+' / '+(p.tipo_injerto||'—'));
+    h+=rw('GRWR',p.grwr);
+    h+=rw('Piggy back / Portoplastia',(p.piggy_back||'—')+' / '+(p.portoplastia||'—'));
+    h+=rw('Vía biliar / TIF',(p.via_biliar||'—')+' / '+(p.tif||'—'));
+    if(p.complicaciones_post&&p.complicaciones_post.length){
+      h+='<div class="det-row"><span class="det-l">Complicaciones</span><span class="det-v" style="font-size:12px;">';
+      p.complicaciones_post.forEach(function(c){h+='• '+fmtF(c.fecha)+' — '+c.desc+'<br>';});
+      h+='</span></div>';
+    }
+    h+='</div>';
+  }
+
+  if(t==='retx')h+=rw('Causa fallo injerto previo',p.causa_fallo);
+
+  h+='<div class="det-sec"><div class="det-slbl">Laboratorio</div>';
+  if(labAct)h+='<div style="font-size:10px;color:#888;margin-bottom:5px;">Último: '+fmtF(labAct.fecha)+'</div>';
+  h+='<div class="labgrid">';
+  [['Bili total',labAct?labAct.bili:p.bili,'mg/dL'],['TGO/AST',labAct?labAct.tgo:p.tgo,'U/L'],['TGP/ALT',labAct?labAct.tgp:p.tgp,'U/L'],['GGT',labAct?labAct.ggt:p.ggt,'U/L'],['Quick/TP',labAct?labAct.tp:p.tp,'%'],['INR',labAct?labAct.inr:p.inr,''],['Albúmina',labAct?labAct.alb:p.alb,'g/dL'],['Creatinina',labAct?labAct.creat:p.creat,'mg/dL']].forEach(function(x){
+    h+='<div class="labcard"><div class="labcard-l">'+x[0]+'</div><div class="labcard-v">'+(x[1]||'—')+'<span class="labcard-u"> '+x[2]+'</span></div></div>';
+  });
+  h+='</div>';
+  if(labHist.length>1){
+    h+='<div class="lab-hist"><div style="font-weight:600;color:#666;margin-bottom:4px;font-size:10px;">Historial</div>';
+    labHist.slice().reverse().slice(0,5).forEach(function(l){h+='<div class="lhr"><span>'+fmtF(l.fecha)+'</span><span>Bili '+(l.bili||'—')+' · INR '+(l.inr||'—')+' · TGO '+(l.tgo||'—')+'</span></div>';});
+    h+='</div>';
+  }
+  h+='</div>';
+
+  if(t!=='pre'){
+    h+='<div class="det-sec"><div class="det-slbl" style="color:#185FA5;">IS de mantenimiento</div>';
+    if(p.tacro)h+=rw('Tacrolimus (FK)',p.tacro+' ng/mL'+(p.tacro_obj?' (obj: '+p.tacro_obj+')':''));
+    h+=rw('MMF',p.mmf);h+=rw('Corticoides',p.cort);h+=rw('mTOR',p.mtor);
+    if(p.is_extra&&p.is_extra.length)h+=rw('Otros IS',p.is_extra.join(', '));
+    if(fkHist.length){
+      h+='<table class="fk-table"><tr><th>Fecha</th><th>Nivel (ng/mL)</th><th>Dosis</th></tr>';
+      fkHist.slice().reverse().slice(0,5).forEach(function(f){h+='<tr><td>'+fmtF(f.fecha)+'</td><td><strong>'+(f.nivel||'—')+'</strong></td><td>'+(f.dosis||'—')+'</td></tr>';});
+      h+='</table>';
+    }
+    h+='</div>';
+    h+='<div class="det-sec"><div class="det-slbl">Complicaciones</div>';
+    h+=rw('Rechazo',p.rechazo);h+=rw('Vascular',p.vascular);h+=rw('Biliar',p.biliar);
+    h+=rw('Infección',p.infec);h+=rw('PTLD',p.ptld);if(p.otras)h+=rw('Otras',p.otras);
+    h+='</div>';
+  }
+
+  h+='<div class="det-sec"><div class="det-slbl">ATB / profilaxis</div>';
+  if(p.fecha_inicio_atb)h+='<div style="font-size:11px;color:#888;margin-bottom:5px;">Inicio: '+fmtF(p.fecha_inicio_atb)+(da!==null?' (día '+da+')':'')+'</div>';
+  h+=pp(p.abx,'t-a');
+  h+='<div style="font-size:11px;color:#888;margin-top:6px;">CMV: '+(p.pcmv||'No')+' · PCP: '+(p.ppcp||'No')+' · Antifúngico: '+(p.paf||'No')+'</div>';
+  h+='</div>';
+  h+='<div class="det-sec"><div class="det-slbl">Cultivos y cargas virales</div>'+pp(p.cults,'t-c')+'</div>';
+  h+='<div class="det-sec"><div class="det-slbl">Antitrombótico</div>'+pp(p.atb,'t-t')+'</div>';
+
+  h+='<div class="det-sec"><div class="det-slbl">Nutrición y soporte</div>';
+  h+=rw('Alimentación',p.nutri);if(p.diur)h+=rw('Diuresis',p.diur+' mL/kg/h');
+  h+=rw('Ventilación',p.vent);h+=rw('Soporte hemodinámico',p.hemodi);
+  h+='</div>';
+
+  if(p.obs)h+='<div class="det-sec"><div class="det-slbl">Plan del día</div><div style="font-size:13px;line-height:1.7;white-space:pre-wrap;">'+p.obs+'</div></div>';
+
+  h+='<div class="det-sec"><div class="det-slbl">Pronóstico estimado</div>';
+  h+='<div class="sbox"><span class="badge '+sc.cls+'">'+sc.niv+'</span>'+(sc.de!==null?' <span style="font-size:11px;color:#888;">~'+sc.de+' días adicionales</span>':'')+'</div></div>';
+
+  h+='<div class="form-actions">';
+  h+='<button class="btn-sec" onclick="showForm(PXS.find(function(x){return x.id==='+p.id+';}))">Editar</button>';
+  h+='<button class="btn-alta" onclick="darAlta('+p.id+')">Dar de alta ✓</button>';
+  h+='</div>';
+
+  document.getElementById('det-inner').innerHTML=h;
+}
+
+// FORM
+function buildForm(p){
+  var gv=function(f,fb){var val=p?p[f]:undefined;return val!=null?val:(fb!=null?fb:'');};
+  var mo=gv('momento','');
+
+  var h='<div style="font-size:15px;font-weight:700;margin-bottom:.8rem;">'+(EID?'Editar':'Nuevo')+' paciente</div>';
+
+  // Contexto
+  h+='<div class="sec-box"><div class="sec-lbl">Contexto clínico</div>';
+  h+='<div class="fld gca" style="margin-bottom:8px;"><label>Momento respecto al trasplante</label>';
+  h+='<select id="fmo" onchange="onMomento()">';
+  h+='<option value="">— seleccionar —</option>';
+  [['pre','Pre-trasplante (lista / evaluación)'],['post_inmediato','Post-Tx inmediato (UCI / primeras 2 semanas)'],['post_temprano','Post-Tx temprano (2 sem – 6 meses)'],['post_tardio','Post-Tx tardío (más de 6 meses)'],['retx','Re-trasplante']].forEach(function(x){
+    h+='<option value="'+x[0]+'"'+(mo===x[0]?' selected':'')+'>'+x[1]+'</option>';
+  });
+  h+='</select></div>';
+  h+='<div class="g2"><div class="fld"><label>Estado general</label><select id="fest">';
+  ['','Estable','Compensado','Inestable','Crítico (UCI/UTIP)'].forEach(function(o){h+='<option'+(gv('estado')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div></div>';
+  h+='<div id="ctx-box" class="ctx-box" style="display:none;"></div></div>';
+
+  // ID
+  h+='<div class="sec-box"><div class="sec-lbl">Identificación</div><div class="g2">';
+  h+='<div class="fld gca"><label>Nombre y apellido</label><input id="fnom" value="'+gv('nombre')+'" placeholder="Apellido, Nombre" autocapitalize="words"></div>';
+  h+='<div class="fld"><label>Edad</label><div class="ar"><input id="fedad" type="number" min="0" value="'+gv('edad_n')+'" placeholder="número" style="width:auto;"><select id="fedadu" style="width:auto;">';
+  ['años','meses','días'].forEach(function(u){h+='<option'+(gv('edad_u','años')===u?' selected':'')+'>'+u+'</option>';});
+  h+='</select></div></div>';
+  h+='<div class="fld"><label>Peso (kg)</label><input id="fpeso" type="number" step="0.1" value="'+gv('peso')+'" placeholder="kg"></div>';
+  h+='<div class="fld gca"><label>Diagnóstico</label><select id="fdiag" onchange="onDiag()" ><option value="">—</option>';
+  ['Atresia de vías biliares','Síndrome de Alagille','Colestasis intrahepática progresiva (PFIC)','Colangitis esclerosante primaria','Enfermedad de Wilson','Tirosinemia tipo I','Déficit de alfa-1 antitripsina','Glucogenosis','Acidemia orgánica','Defecto del ciclo de la urea','Otra enfermedad metabólica','Falla hepática aguda (FH)','Cirrosis (otra causa)','Hepatoblastoma','Hepatitis autoinmune (HAI)','Síndrome de Budd-Chiari','ACLF (Fallo hepático agudo sobre crónico)','Otro'].forEach(function(o){h+='<option'+(gv('diag')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>Enfermedad de base</label><input id="fenf" value="'+gv('enf_base')+'" placeholder="Ej: HAI, AVB..."></div>';
+  h+='<div class="fld"><label>HC</label><input id="fhc" value="'+gv('hc')+'" placeholder="Nº historia clínica"></div>';
+  h+='<div class="fld" id="wrap-kasai" style="display:'+(gv('diag','').indexOf('vías biliares')>=0?'flex':'none')+';flex-direction:column;gap:3px;"><label>Kasai previo</label><select id="fkasai">';
+  ['—','Sí','No'].forEach(function(o){h+='<option'+(gv('cirugia_previa')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>Sala / Unidad</label><select id="fsala" onchange="onSala()">';
+  var salaVal=gv('sala','');
+  ['','UCI 72','CIM 61','otro'].forEach(function(o){
+    var label=o===''?'— seleccionar —':o==='otro'?'Otro':o;
+    var sel=o===''?(!salaVal):o==='otro'?(!['UCI 72','CIM 61'].includes(salaVal)&&salaVal!==''):salaVal===o;
+    h+='<option value="'+o+'"'+(sel?' selected':'')+'>'+label+'</option>';
+  });
+  h+='</select></div>';
+  h+='<div class="fld" id="fsala-otro-wrap" style="display:'+((!['UCI 72','CIM 61',''].includes(salaVal))?'block':'none');+'"><label>Especificar sala</label><input id="fsalaotro" value="'+((!['UCI 72','CIM 61',''].includes(salaVal))?salaVal:'')+'" placeholder="Ej: CIM 62..."></div>';
+  h+='<div class="fld"><label>Cama / lugar</label><input id="flugar" value="'+gv('lugar_int')+'" placeholder="Nº cama, box..."></div>';
+  h+='<div class="fld"><label>Nacionalidad</label><input id="fnac" value="'+gv('nacionalidad')+'" placeholder="Argentino/a"></div>';
+  h+='<div class="fld"><label>Residencia</label>';
+  h+='<select id="fres" onchange="onRes()">';
+  h+='<option value="">— seleccionar —</option>';
+  h+='<option'+(gv('residencia')==='Buenos Aires'?' selected':'')+'>Buenos Aires</option>';
+  h+='<option'+(gv('residencia')==='CABA'?' selected':'')+'>CABA</option>';
+  h+='<option'+(gv('residencia')==='Catamarca'?' selected':'')+'>Catamarca</option>';
+  h+='<option'+(gv('residencia')==='Chaco'?' selected':'')+'>Chaco</option>';
+  h+='<option'+(gv('residencia')==='Chubut'?' selected':'')+'>Chubut</option>';
+  h+='<option'+(gv('residencia')==='Córdoba'?' selected':'')+'>Córdoba</option>';
+  h+='<option'+(gv('residencia')==='Corrientes'?' selected':'')+'>Corrientes</option>';
+  h+='<option'+(gv('residencia')==='Entre Ríos'?' selected':'')+'>Entre Ríos</option>';
+  h+='<option'+(gv('residencia')==='Formosa'?' selected':'')+'>Formosa</option>';
+  h+='<option'+(gv('residencia')==='Jujuy'?' selected':'')+'>Jujuy</option>';
+  h+='<option'+(gv('residencia')==='La Pampa'?' selected':'')+'>La Pampa</option>';
+  h+='<option'+(gv('residencia')==='La Rioja'?' selected':'')+'>La Rioja</option>';
+  h+='<option'+(gv('residencia')==='Mendoza'?' selected':'')+'>Mendoza</option>';
+  h+='<option'+(gv('residencia')==='Misiones'?' selected':'')+'>Misiones</option>';
+  h+='<option'+(gv('residencia')==='Neuquén'?' selected':'')+'>Neuquén</option>';
+  h+='<option'+(gv('residencia')==='Río Negro'?' selected':'')+'>Río Negro</option>';
+  h+='<option'+(gv('residencia')==='Salta'?' selected':'')+'>Salta</option>';
+  h+='<option'+(gv('residencia')==='San Juan'?' selected':'')+'>San Juan</option>';
+  h+='<option'+(gv('residencia')==='San Luis'?' selected':'')+'>San Luis</option>';
+  h+='<option'+(gv('residencia')==='Santa Cruz'?' selected':'')+'>Santa Cruz</option>';
+  h+='<option'+(gv('residencia')==='Santa Fe'?' selected':'')+'>Santa Fe</option>';
+  h+='<option'+(gv('residencia')==='Santiago del Estero'?' selected':'')+'>Santiago del Estero</option>';
+  h+='<option'+(gv('residencia')==='Tierra del Fuego'?' selected':'')+'>Tierra del Fuego</option>';
+  h+='<option'+(gv('residencia')==='Tucumán'?' selected':'')+'>Tucumán</option>';
+  h+='<option value="Extranjero"'+(gv('residencia')==='Extranjero'?' selected':'')+'>Extranjero</option>';
+  h+='</select>';
+  var _resv=gv('residencia','');
+  var _resext=(_resv==='Extranjero');
+  var _resprov=['Buenos Aires','CABA','Catamarca','Chaco','Chubut','Córdoba','Corrientes','Entre Ríos','Formosa','Jujuy','La Pampa','La Rioja','Mendoza','Misiones','Neuquén','Río Negro','Salta','San Juan','San Luis','Santa Cruz','Santa Fe','Santiago del Estero','Tierra del Fuego','Tucumán'].indexOf(_resv)>=0;
+  h+='<input id="fres-ext" value="'+(_resext?gv('residencia_detalle',''):'')+'" placeholder="País de origen" style="margin-top:5px;display:'+(_resext?'block':'none')+'">';
+  h+='</div>';
+  h+='<div class="fld"><label>Grupo y factor</label><select id="fgf">';
+  ['','0+','0-','A+','A-','B+','B-','AB+','AB-'].forEach(function(o){h+='<option value="'+o+'"'+(gv('grupo_factor')===o?' selected':'')+'>'+( o||'— seleccionar —')+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>Fecha de ingreso</label><input id="ffi" type="date" value="'+gv('fecha_ingreso',hoy())+'"></div>';
+  h+='</div>';
+  h+='<div class="fld" style="margin-top:6px;"><label>Otro laboratorio (texto libre)</label><input id="flab_otro" value="'+gv('lab_otro')+'" placeholder="Ej: LDH 450, ácido úrico 7..."></div>';
+  h+='</div>';
+
+  // Motivo
+  h+='<div class="sec-box"><div class="sec-lbl">Motivo de internación</div>';
+  h+='<div class="fld"><textarea id="fmot" placeholder="Motivo principal, situación clínica actual...">'+gv('motivo')+'</textarea></div>';
+  h+='<div class="fld" style="margin-top:7px;"><label>Pendientes (uno por línea)</label><textarea id="fpend" placeholder="Odontología&#10;Ginecología&#10;Nefrología...">'+gv('pendientes')+'</textarea></div>';
+  h+='<div class="fld" style="margin-top:7px;"><label>Problema actual</label><input id="fprob" value="'+gv('problema_actual')+'" placeholder="Problema clínico activo principal"></div></div>';
+
+  // PRE
+  h+='<div id="sec-pre" style="display:'+(mo==='pre'||mo==='retx'?'block':'none')+';">';
+  h+='<div class="sec-box"><div class="sec-lbl green">Pre-trasplante</div><div class="g4">';
+  var edadN=parseInt(gv('edad_n',0))||0;
+  var edadU=gv('edad_u','años');
+  var esMenor12=(edadU==='meses'||edadU==='días'||(edadU==='años'&&edadN<12));
+  if(esMenor12){
+    h+='<div class="fld" id="wrap-peld"><label>PELD <span style="font-size:10px;color:#888;">(< 12 años)</span></label><input id="fpeld" type="number" value="'+gv('peld')+'" placeholder="score"></div>';
+    h+='<input type="hidden" id="fmeld" value="">';
+  } else {
+    h+='<div class="fld" id="wrap-meld"><label>MELD <span style="font-size:10px;color:#888;">(≥ 12 años)</span></label><input id="fmeld" type="number" value="'+gv('meld')+'" placeholder="score"></div>';
+    h+='<input type="hidden" id="fpeld" value="">';
+  }
+  h+='<div class="fld"><label>Estado en lista</label><select id="flista">';
+  ['','Activo','Inactivo','No ingresado aún'].forEach(function(o){h+='<option'+(gv('lista_estado')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>Fecha ingreso lista</label><input id="fflist" type="date" value="'+gv('fecha_lista')+'"></div>';
+  var compCirOptions=['Encefalopatía','Ascitis','Hemorragia digestiva (HDA/HDB)','Síndrome hepatorrenal','Peritonitis bacteriana espontánea','Ictericia','Coagulopatía','Desnutrición','Hipertensión portal','Esplenomegalia'];
+  var compCirCurrent=(gv('complic_cirrosis','')||'').split(',').map(function(x){return x.trim();}).filter(Boolean);
+  h+='<div class="fld gc2"><label>Complicaciones de cirrosis</label>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:8px;border:1px solid #ddd;border-radius:7px;background:#fff;">';
+  compCirOptions.forEach(function(o){
+    var checked=compCirCurrent.indexOf(o)>=0;
+    h+='<label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;"><input type="checkbox" id="cc_'+o.replace(/[^a-zA-Z]/g,'_')+'" value="'+o+'"'+(checked?' checked':'')+' style="width:auto;"> '+o+'</label>';
+  });
+  h+='<div class="fld" style="grid-column:1/-1;margin-top:4px;"><label style="font-size:11px;color:#888;">Otra</label><input id="compcirrosis_otro" value="'+gv('complic_cirrosis_otro')+'" placeholder="Especificar..."></div>';
+  h+='</div></div>';
+  h+='<div class="fld"><label>Talla (cm)</label><input id="ftalla" type="number" value="'+gv('talla')+'"></div>';
+  h+='<div class="fld"><label>PU (cm)</label><input id="fpu" type="number" value="'+gv('pu')+'"></div>';
+  h+='</div>';
+  h+='<div style="margin-top:10px;"><div class="sec-lbl">Evaluaciones pre-trasplante</div><div class="eval-grid">';
+  [['cardio','Cardiología'],['neumo','Neumología'],['nefro','Nefrología'],['infecto','Infectología'],['neuro','Neurología'],['orl','ORL'],['oftalmo','Oftalmología'],['salud_mental','Salud Mental'],['s_social','Serv. Social'],['alimentacion','Alimentación'],['gineco','Ginecología']].forEach(function(x){
+    var val=gv('eval_'+x[0],'');
+    var cls=val==='pendiente'?'pend':val==='apto'?'apto':'';
+    h+='<div class="eval-item"><label>'+x[1]+'</label><select id="eval_'+x[0]+'" class="'+cls+'" onchange="onEval(this)">';
+    ['','apto','pendiente','no aplica'].forEach(function(o){h+='<option value="'+o+'"'+(val===o?' selected':'')+'>'+( o||'—')+'</option>';});
+    h+='</select></div>';
+  });
+  h+='</div></div>';
+  h+='<div class="fld" style="margin-top:8px;"><label>Donante vivo relacionado (DVR)</label>';
+  h+='<select id="fdvr_yn" onchange="onDVR()">';
+  ['No','Sí'].forEach(function(o){h+='<option'+(gv('dvr_yn','No')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div id="dvr-datos" style="margin-top:8px;display:'+(gv('dvr_yn','No')==='Sí'?'block':'none')+';">';
+  h+='<div style="background:#f0f0f0;border-radius:8px;padding:10px;border:1px solid #ddd;">';
+  h+='<div style="font-size:10px;font-weight:700;color:#666;text-transform:uppercase;margin-bottom:8px;">Datos del DVR</div>';
+  h+='<div class="g4">';
+  h+='<div class="fld"><label>Familiar (parentesco)</label><input id="fdvr_fam" value="'+gv('dvr_familiar')+'" placeholder="Madre, padre, hermano..."></div>';
+  h+='<div class="fld"><label>DNI</label><input id="fdvr_dni" value="'+gv('dvr_dni')+'" placeholder="DNI"></div>';
+  h+='<div class="fld"><label>HC</label><input id="fdvr_hc" value="'+gv('dvr_hc')+'" placeholder="Historia clínica"></div>';
+  h+='<div class="fld"><label>Peso (kg)</label><input id="fdvr_peso" type="number" step="0.1" value="'+gv('dvr_peso')+'" placeholder="kg"></div>';
+  h+='<div class="fld"><label>Talla (cm)</label><input id="fdvr_talla" type="number" value="'+gv('dvr_talla')+'" placeholder="cm"></div>';
+  h+='<div class="fld"><label>IMC</label><input id="fdvr_imc" value="'+gv('dvr_imc')+'" placeholder="calculado"></div>';
+  h+='<div class="fld"><label>Grupo y factor</label><select id="fdvr_gf">';
+  ['','0+','0-','A+','A-','B+','B-','AB+','AB-'].forEach(function(o){h+='<option value="'+o+'"'+(gv('dvr_gf')===o?' selected':'')+'>'+( o||'—')+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>GRWR (%)</label><input id="fdvr_grwr" value="'+gv('dvr_grwr')+'" placeholder="0.8-4"></div>';
+  h+='</div></div></div>';
+  h+='</div></div>';
+
+  // RETX
+  h+='<div id="sec-retx" style="display:'+(mo==='retx'?'block':'none')+';">';
+  h+='<div class="sec-box"><div class="sec-lbl purple">Re-trasplante</div><div class="g2">';
+  h+='<div class="fld"><label>Causa fallo injerto previo</label><input id="fcausa" value="'+gv('causa_fallo')+'" placeholder="Trombosis, rechazo crónico..."></div>';
+  h+='<div class="fld"><label>Fecha re-Tx</label><input id="fretxf" type="date" value="'+gv('fecha_retx')+'"></div>';
+  h+='</div></div></div>';
+
+  // POST
+  h+='<div id="sec-post" style="display:'+((mo&&mo!=='pre')?'block':'none')+';">';
+  h+='<div class="sec-box"><div class="sec-lbl blue">Datos del trasplante</div><div class="g4">';
+  h+='<div class="fld"><label>Fecha de trasplante</label><input id="fftx" type="date" value="'+gv('fecha_tx')+'"></div>';
+  h+='<div class="fld"><label>Compatibilidad ABO</label><select id="fabo"><option value="">—</option><option'+(gv('abo')==='Compatible'?' selected':'')+'>Compatible</option><option'+(gv('abo')==='Incompatible'?' selected':'')+'>Incompatible</option></select></div>';
+  h+='<div class="fld"><label>Riesgo inmunológico</label><select id="friesgo"><option value="">—</option>';
+  ['Bajo','Moderado','Alto (retx / DSA+ / sensibilizado)'].forEach(function(o){h+='<option'+(gv('riesgo')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>PRA</label><input id="fpra" value="'+gv('pra')+'" placeholder="%"></div>';
+  h+='<div class="fld"><label>DSA</label><input id="fdsa" value="'+gv('dsa')+'" placeholder="Pos/Neg"></div>';
+  h+='<div class="fld"><label>Donante</label><select id="fdon"><option value="">—</option>';
+  ['Cadavérico','Donante vivo','Split','Dominó'].forEach(function(o){h+='<option'+(gv('donante')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>Tipo de injerto</label><select id="ftinj"><option value="">—</option>';
+  ['Monosegmento','Segmento lateral izq','Lóbulo izquierdo','Lóbulo derecho','Órgano completo'].forEach(function(o){h+='<option'+(gv('tipo_injerto')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>GRWR (%)</label><input id="fgrwr" value="'+gv('grwr')+'" placeholder="0.8-4"></div>';
+  h+='<div class="fld"><label>Peso explante (g)</label><input id="fpexpl" type="number" value="'+gv('peso_explante')+'"></div>';
+  h+='<div class="fld"><label>Peso implante (g)</label><input id="fpimpl" type="number" value="'+gv('peso_implante')+'"></div>';
+  h+='<div class="fld"><label>TIF</label><input id="ftif" value="'+gv('tif')+'" placeholder="3hs 30min"></div>';
+  h+='<div class="fld"><label>Piggy back</label><select id="fpiggy">';
+  ['—','SI','NO'].forEach(function(o){h+='<option'+(gv('piggy_back','—')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>Portoplastia</label><select id="fportop">';
+  ['—','SI','NO'].forEach(function(o){h+='<option'+(gv('portoplastia','—')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>Graft arterial</label><select id="fgartf">';
+  ['—','SI','NO'].forEach(function(o){h+='<option'+(gv('graft_art','—')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>Graft venoso</label><select id="fgvenf">';
+  ['—','SI','NO'].forEach(function(o){h+='<option'+(gv('graft_ven','—')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>Vía biliar</label><input id="fviabil" value="'+gv('via_biliar')+'" placeholder="1 BD, 2 BD, HY..."></div>';
+  h+='<div class="fld"><label>Cobertura</label><input id="fcob" value="'+gv('cobertura')+'" placeholder="PAMI, OSDE, pública..."></div>';
+  h+='</div>';
+  // Complicaciones cronológicas
+  h+='<div style="margin-top:10px;"><div class="sec-lbl">Complicaciones post-Tx (cronológico)</div>';
+  h+='<div class="g2" style="margin-bottom:6px;"><div class="fld"><label>Fecha</label><input id="fcompf" type="date"></div><div class="fld"><label>Descripción</label><input id="fcompd" placeholder="TAH, colangitis..."></div></div>';
+  h+='<button type="button" class="btn-sec" style="font-size:12px;padding:7px 12px;" onclick="addComp()">+ Agregar complicación</button>';
+  h+='<div id="comp-list" style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;">';
+  COMP.forEach(function(c,j){h+='<span class="tg t-a">'+fmtF(c.fecha)+' — '+c.desc+'<span class="tx" onclick="rmComp('+j+')">×</span></span>';});
+  h+='</div></div></div>';
+
+  // IS mantenimiento
+  h+='<div class="sec-box"><div class="sec-lbl blue">IS de mantenimiento</div>';
+  h+='<div style="margin-bottom:8px;"><div class="sec-lbl" style="font-size:10px;margin-bottom:6px;">Nivel FK actual</div>';
+  h+='<div class="g3">';
+  h+='<div class="fld"><label>Nivel valle (ng/mL)</label><input id="ftacro" type="number" step="0.1" value="'+gv('tacro')+'" placeholder="ng/mL"></div>';
+  h+='<div class="fld"><label>Objetivo FK (ng/mL) <span style="font-size:10px;color:#888;">7-10: 1°sem / 5-7: hasta 1a / 3-5: >1a</span></label><input id="ftacroo" type="number" step="0.1" value="'+gv('tacro_obj')+'" placeholder="obj."></div>';
+  h+='<div class="fld"><label>Dosis FK</label><input id="ftacrod" value="'+gv('tacro_dosis')+'" placeholder="mg/kg/d"></div>';
+  h+='</div>';
+  h+='<button type="button" class="btn-sec" style="font-size:12px;padding:7px 12px;margin-top:6px;" onclick="addFK()">+ Guardar nivel FK con fecha de hoy</button>';
+  if(FKH.length){
+    h+='<div class="lab-hist" style="margin-top:6px;">';
+    FKH.slice().reverse().slice(0,4).forEach(function(f){h+='<div class="lhr"><span>'+fmtF(f.fecha)+'</span><span>'+f.nivel+' ng/mL · '+(f.dosis||'—')+'</span></div>';});
+    h+='</div>';
+  }
+  h+='</div>';
+  h+='<div class="g4">';
+  h+='<div class="fld"><label>MMF</label><select id="fmmf">';
+  ['No','Sí — dosis habitual','Dosis reducida','Suspendido'].forEach(function(o){h+='<option'+(gv('mmf','No')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>Corticoides</label><select id="fcort">';
+  ['No / suspendido','Mantenimiento','Pulso IV (rechazo)','En descenso'].forEach(function(o){h+='<option'+(gv('cort','No / suspendido')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>mTOR</label><select id="fmtor">';
+  ['No','Sirolimus','Everolimus'].forEach(function(o){h+='<option'+(gv('mtor','No')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld gca"><label>Otros IS</label><div class="tw" id="fwi"><input id="fii" placeholder="Enter para agregar..." onkeydown="ftag(event,\'i\')"></div></div>';
+  h+='</div></div>';
+
+  // Complicaciones
+  h+='<div class="sec-box"><div class="sec-lbl blue">Complicaciones post-trasplante</div><div class="g4">';
+  h+='<div class="fld"><label>Rechazo</label><select id="frec">';
+  ['No','Agudo leve','Agudo moderado','Agudo grave','Crónico / ductopénico','Humoral (AMR)'].forEach(function(o){h+='<option'+(gv('rechazo','No')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>Comp. vascular</label><select id="fvas">';
+  ['No','Trombosis arteria hepática','Trombosis portal','Estenosis arteria hepática','Estenosis portal'].forEach(function(o){h+='<option'+(gv('vascular','No')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>Comp. biliar</label><select id="fbil">';
+  ['No','Estenosis biliar','Fístula / bilioma','Colangitis'].forEach(function(o){h+='<option'+(gv('biliar','No')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>Infección activa</label><select id="finf">';
+  ['No','Bacteriana','CMV','EBV','Adenovirus','Viral (otro)','Fúngica','Múltiple'].forEach(function(o){h+='<option'+(gv('infec','No')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld gc2"><label>PTLD</label><select id="fptld">';
+  ['No','Sospecha','Confirmado — en tratamiento'].forEach(function(o){h+='<option'+(gv('ptld','No')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld gc2"><label>Otras complicaciones</label><input id="fotras" value="'+gv('otras')+'" placeholder="HTA, insuf. renal, neurotoxicidad FK..."></div>';
+  h+='</div></div></div>';
+
+  // Laboratorio
+  var labHist=p?p.lab_history||[]:[];
+  h+='<div class="sec-box"><div class="sec-lbl">Laboratorio — '+fmtF(hoy())+'</div>';
+  if(labHist.length)h+='<div style="font-size:11px;background:#EAF3DE;border:1px solid #C0DD97;color:#27500A;border-radius:7px;padding:5px 9px;margin-bottom:8px;">✓ '+labHist.length+' registro(s) anteriores guardados. Al guardar se agrega el de hoy.</div>';
+  h+='<div class="g4">';
+  [['fbili','Bili total (mg/dL)',gv('bili')],['fbilidirect','Bili directa (mg/dL)',gv('bili_directa')],['ftgo','TGO/AST (U/L)',gv('tgo')],['ftgp','TGP/ALT (U/L)',gv('tgp')],['fggt','GGT (U/L)',gv('ggt')],['ftp','Quick/TP (%)',gv('tp')],['finr','INR',gv('inr')],['falb','Albúmina (g/dL)',gv('alb')],['fcreat','Creatinina (mg/dL)',gv('creat')],['fhb','Hb (g/dL)',gv('hb')],['fhto','Hto (%)',gv('hto')],['fgb','GB (/mm³)',gv('gb')],['fplaq','Plaquetas (x10³)',gv('plaq')],['furea','Urea (mg/dL)',gv('urea')],['fafp','AFP (ng/mL)',gv('afp')]].forEach(function(x){
+    h+='<div class="fld"><label>'+x[1]+'</label><input id="'+x[0]+'" type="number" step="0.1" min="0" value="'+x[2]+'"></div>';
+  });
+  h+='</div></div>';
+
+  // ATB
+  h+='<div class="sec-box"><div class="sec-lbl">ATB, antivirales, antifúngicos</div>';
+  h+='<div class="fld" style="margin-bottom:8px;"><label>Fecha inicio ATB</label><input id="ffatb" type="date" value="'+gv('fecha_inicio_atb')+'"></div>';
+  h+='<div class="tw" id="fwa" style="margin-bottom:8px;"><input id="fia" placeholder="Fármaco + dosis — Enter para agregar..." onkeydown="ftag(event,\'a\')"></div>';
+  h+='<div class="g3">';
+  h+='<div class="fld"><label>Profilaxis CMV</label><select id="fpcmv">';
+  ['No','Valganciclovir','Ganciclovir IV'].forEach(function(o){h+='<option'+(gv('pcmv','No')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>Profilaxis PCP</label><select id="fppcp">';
+  ['No','TMP-SMX','Pentamidina'].forEach(function(o){h+='<option'+(gv('ppcp','No')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>Antifúngico profilaxis</label><select id="fpaf">';
+  ['No','Fluconazol','Micafungina','Anfotericina B'].forEach(function(o){h+='<option'+(gv('paf','No')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div></div></div>';
+
+  // Cultivos
+  h+='<div class="sec-box"><div class="sec-lbl">Cultivos y cargas virales</div>';
+  h+='<div class="g2" style="margin-bottom:6px;"><div class="fld"><label>Fecha del cultivo</label><input id="fcfecha" type="date" value="'+hoy()+'"></div>';
+  h+='<div class="fld"><label>Tipo de muestra</label><select id="fcm">';
+  h+='<option value="">— seleccionar —</option>';
+  ['Hemocultivo (lumen blanco)','Hemocultivo (lumen violeta)','Hemocultivo (lumen rojo)','Urocultivo','Cultivo de bilis','Cultivo de líquido peritoneal','Cultivo de secreción','Carga viral CMV','Carga viral EBV (Epstein-Barr)','Carga viral Adenovirus','Hisopado nasofaríngeo','Líquido pleural','LCR','PCR COVID-19','Otro'].forEach(function(o){h+='<option>'+o+'</option>';});
+  h+='</select></div></div>';
+  h+='<div class="g2">';
+  h+='<div class="fld"><label>Resultado / valor</label><select id="fcr"><option value="">—</option>';
+  ['Pendiente','Negativo','Positivo','En descenso','En ascenso'].forEach(function(o){h+='<option>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>Germen / valor / sensibilidad</label><input id="fcg" placeholder="E. coli BLEE, 2500 cop/mL..."></div></div>';
+  h+='<button type="button" class="btn-sec" style="margin-top:8px;font-size:13px;" onclick="addCult()">+ Agregar cultivo</button>';
+  h+='<div id="fcl" style="margin-top:7px;display:flex;flex-wrap:wrap;gap:4px;">';
+  FC.forEach(function(c,j){h+='<span class="tg t-c">'+c+'<span class="tx" onclick="rmCult('+j+')">×</span></span>';});
+  h+='</div></div>';
+
+  // Antitrombótico
+  h+='<div class="sec-box"><div class="sec-lbl">Tratamiento antitrombótico</div>';
+  h+='<div class="tw" id="fwt"><input id="fit" placeholder="Heparina, enoxaparina, AAS... Enter" onkeydown="ftag(event,\'t\')"></div></div>';
+
+  // Nutrición
+  h+='<div class="sec-box"><div class="sec-lbl">Nutrición y soporte</div><div class="g4">';
+  h+='<div class="fld"><label>Ventilación</label><select id="fvent">';
+  ['Sin soporte','O2 cánula nasal','VNI (CPAP/BiPAP)','ARM'].forEach(function(o){h+='<option'+(gv('vent','Sin soporte')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>Soporte hemodinámico</label><select id="fhemo">';
+  ['No','Dopamina','Noradrenalina','Múltiples vasoactivos'].forEach(function(o){h+='<option'+(gv('hemodi','No')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>Alimentación</label><select id="fnutri">';
+  ['—','Oral','SNG / SND','NPT','NPT + SNG','Ayuno'].forEach(function(o){h+='<option'+(gv('nutri','—')===o?' selected':'')+'>'+o+'</option>';});
+  h+='</select></div>';
+  h+='<div class="fld"><label>Diuresis (mL/kg/h)</label><input id="fdiur" type="number" step="0.1" value="'+gv('diur')+'" placeholder="mL/kg/h"></div>';
+  h+='</div></div>';
+
+  // Plan
+  h+='<div class="sec-box"><div class="sec-lbl">Plan del día / observaciones</div>';
+  h+='<div class="fld"><textarea id="fobs" placeholder="Plan, indicaciones, interconsultas...">'+gv('obs')+'</textarea></div></div>';
+
+  h+='<div class="form-actions">';
+  h+='<button class="btn-pri" onclick="fguardar()">Guardar ↗</button>';
+  h+='<button class="btn-sec" onclick="showSala()">Cancelar</button>';
+  if(EID)h+='<button class="btn-del" onclick="delPx('+EID+')">Eliminar</button>';
+  h+='</div>';
+
+  document.getElementById('form-inner').innerHTML=h;
+  ['a','i','t'].forEach(function(t){frtags(t);});
+  onMomento();
+}
+
+function onRes(){
+  var v=document.getElementById('fres')?document.getElementById('fres').value:'';
+  var ext=document.getElementById('fres-ext');
+  if(ext)ext.style.display=v==='Extranjero'?'block':'none';
+}
+function onDVR(){
+  var v=document.getElementById('fdvr_yn')?document.getElementById('fdvr_yn').value:'No';
+  var d=document.getElementById('dvr-datos');if(d)d.style.display=v==='Sí'?'block':'none';
+}
+function onDiag(){
+  var v=document.getElementById('fdiag')?document.getElementById('fdiag').value:'';
+  var w=document.getElementById('wrap-kasai');
+  if(w)w.style.display=v.indexOf('vías biliares')>=0?'flex':'none';
+}
+function onMomento(){
+  var v=document.getElementById('fmo')?document.getElementById('fmo').value:'';
+  var msgs={pre:'Paciente en lista de espera o evaluación pre-trasplante.',post_inmediato:'Post-Tx inmediato: inducción IS y monitoreo del injerto.',post_temprano:'Post-Tx temprano (2 sem–6 meses): vigilancia de rechazo e infecciones.',post_tardio:'Post-Tx tardío (>6 meses): función del injerto, adherencia.',retx:'Re-trasplante: documentar causa de fallo del injerto previo.'};
+  var clss={pre:'ctx-pre',post_inmediato:'ctx-post',post_temprano:'ctx-post',post_tardio:'ctx-post',retx:'ctx-retx'};
+  var b=document.getElementById('ctx-box');
+  if(b){b.textContent=msgs[v]||'';b.className='ctx-box '+(clss[v]||'');b.style.display=v?'':'none';}
+  var pre=document.getElementById('sec-pre');if(pre)pre.style.display=(v==='pre'||v==='retx')?'block':'none';
+  var retx=document.getElementById('sec-retx');if(retx)retx.style.display=v==='retx'?'block':'none';
+  var post=document.getElementById('sec-post');if(post)post.style.display=(v&&v!=='pre')?'block':'none';
+}
+function onSala(){
+  var v=document.getElementById('fsala')?document.getElementById('fsala').value:'';
+  var w=document.getElementById('fsala-otro-wrap');if(w)w.style.display=v==='otro'?'block':'none';
+}
+function onEval(el){el.className=el.value==='pendiente'?'pend':el.value==='apto'?'apto':'';}
+
+function ftag(e,t){
+  if(e.key!=='Enter')return;e.preventDefault();
+  var i=document.getElementById('fi'+t);var v=i.value.trim();if(!v)return;
+  FT[t].push(v);i.value='';frtags(t);
+}
+function frtags(t){
+  var w=document.getElementById('fw'+t),i=document.getElementById('fi'+t);
+  if(!w||!i)return;
+  while(w.querySelector('.tg'))w.querySelector('.tg').remove();
+  var cls=t==='a'?'t-a':t==='t'?'t-t':'t-i';
+  FT[t].forEach(function(v,j){
+    var d=document.createElement('div');d.className='tg '+cls;
+    d.innerHTML=v+'<span class="tx" onclick="frmtag(\''+t+'\','+j+')">×</span>';
+    w.insertBefore(d,i);
+  });
+}
+function frmtag(t,j){FT[t].splice(j,1);frtags(t);}
+function addCult(){
+  var m=document.getElementById('fcm')?document.getElementById('fcm').value:'';if(!m)return;
+  var r=document.getElementById('fcr')?document.getElementById('fcr').value:'';
+  var g=document.getElementById('fcg')?document.getElementById('fcg').value.trim():'';
+  var f=document.getElementById('fcfecha')?document.getElementById('fcfecha').value:'';
+  var label=(f?'['+f+'] ':'')+m+(r?' — '+r:'')+(g?' ('+g+')':'');
+  FC.push(label);
+  if(document.getElementById('fcm'))document.getElementById('fcm').selectedIndex=0;
+  if(document.getElementById('fcg'))document.getElementById('fcg').value='';
+  if(document.getElementById('fcr'))document.getElementById('fcr').selectedIndex=0;
+  if(document.getElementById('fcfecha'))document.getElementById('fcfecha').value=hoy();
+  var el=document.getElementById('fcl');if(!el)return;
+  el.innerHTML='';FC.forEach(function(c,j){el.innerHTML+='<span class="tg t-c">'+c+'<span class="tx" onclick="rmCult('+j+')">×</span></span>';});
+}
+function rmCult(j){FC.splice(j,1);var el=document.getElementById('fcl');if(!el)return;el.innerHTML='';FC.forEach(function(c,k){el.innerHTML+='<span class="tg t-c">'+c+'<span class="tx" onclick="rmCult('+k+')">×</span></span>';});}
+function addComp(){
+  var f=document.getElementById('fcompf').value,d=document.getElementById('fcompd').value.trim();if(!d)return;
+  COMP.push({fecha:f||hoy(),desc:d});document.getElementById('fcompd').value='';
+  var el=document.getElementById('comp-list');if(!el)return;
+  el.innerHTML='';COMP.forEach(function(c,j){el.innerHTML+='<span class="tg t-a">'+fmtF(c.fecha)+' — '+c.desc+'<span class="tx" onclick="rmComp('+j+')">×</span></span>';});
+}
+function rmComp(j){COMP.splice(j,1);var el=document.getElementById('comp-list');if(!el)return;el.innerHTML='';COMP.forEach(function(c,k){el.innerHTML+='<span class="tg t-a">'+fmtF(c.fecha)+' — '+c.desc+'<span class="tx" onclick="rmComp('+k+')">×</span></span>';});}
+function addFK(){
+  var n=document.getElementById('ftacro')?document.getElementById('ftacro').value:'';if(!n)return;
+  var d=document.getElementById('ftacrod')?document.getElementById('ftacrod').value:'';
+  FKH.push({fecha:hoy(),nivel:n,dosis:d});
+  var el=document.getElementById('ftacro');if(el)el.value='';
+}
+function fg(id){var el=document.getElementById(id);return el?el.value.trim():'';}
+function fsel(id){var el=document.getElementById(id);return el?el.value:'';}
+
+function fguardar(){
+  var nom=fg('fnom');if(!nom){var el=document.getElementById('fnom');if(el)el.focus();return;}
+  var mo=fsel('fmo');
+  var salaRaw=fsel('fsala');
+  var salaFinal=salaRaw==='otro'?fg('fsalaotro'):salaRaw;
+  var existP=EID?PXS.find(function(x){return x.id===EID;}):null;
+  var oldLabHist=existP?existP.lab_history||[]:[];
+  var oldFKH=existP?existP.fk_history||[]:[];
+  var oldComp=existP?existP.complicaciones_post||[]:[];
+  var newLab={fecha:hoy(),bili:fg('fbili'),bili_directa:fg('fbilidirect'),tgo:fg('ftgo'),tgp:fg('ftgp'),ggt:fg('fggt'),tp:fg('ftp'),inr:fg('finr'),alb:fg('falb'),creat:fg('fcreat'),hb:fg('fhb'),hto:fg('fhto'),gb:fg('fgb'),plaq:fg('fplaq'),urea:fg('furea'),afp:fg('fafp')};
+  var hasLab=Object.keys(newLab).slice(1).some(function(k){return newLab[k];});
+  var labHistory=hasLab?oldLabHist.concat([newLab]):oldLabHist;
+  var tacroV=fg('ftacro');
+  var fkFull=oldFKH.concat(FKH);
+  if(tacroV&&!FKH.find(function(f){return f.fecha===hoy();}))fkFull.push({fecha:hoy(),nivel:tacroV,dosis:fg('ftacrod')});
+  var allComp=oldComp.concat(COMP);
+  var evalKeys=['cardio','neumo','nefro','infecto','neuro','orl','oftalmo','salud_mental','s_social','alimentacion','gineco'];
+  var evals={};
+  evalKeys.forEach(function(k){evals['eval_'+k]=fsel('eval_'+k);});
+  var en=fg('fedad'),eu=fsel('fedadu');
+  var p=Object.assign({
+    id:EID||Date.now(),nombre:nom,
+    edad:en?en+' '+eu:'—',edad_n:en,edad_u:eu,
+    peso:fg('fpeso'),diag:fsel('fdiag'),enf_base:fg('fenf'),
+    hc:fg('fhc'),cirugia_previa:fsel('fkasai'),
+    nacionalidad:fg('fnac'),residencia:fsel('fres'),residencia_detalle:fg('fres-ext'),grupo_factor:fsel('fgf'),
+    fecha_ingreso:fg('ffi'),lugar_int:fg('flugar'),sala:salaFinal,
+    momento:mo,estado:fsel('fest'),
+    motivo:fg('fmot'),pendientes:fg('fpend'),problema_actual:fg('fprob'),
+    peld:fg('fpeld'),meld:fg('fmeld'),lista_estado:fsel('flista'),fecha_lista:fg('fflist'),
+    complic_cirrosis:(function(){
+      var opts=['Encefalopatía','Ascitis','Hemorragia digestiva (HDA/HDB)','Síndrome hepatorrenal','Peritonitis bacteriana espontánea','Ictericia','Coagulopatía','Desnutrición','Hipertensión portal','Esplenomegalia'];
+      var sel=opts.filter(function(o){var el=document.getElementById('cc_'+o.replace(/[^a-zA-Z]/g,'_'));return el&&el.checked;});
+      var otro=fg('compcirrosis_otro');if(otro)sel.push(otro);
+      return sel.join(', ');
+    })(),
+    complic_cirrosis_otro:fg('compcirrosis_otro'),talla:fg('ftalla'),pu:fg('fpu'),dvr_yn:fsel('fdvr_yn'),
+    dvr_familiar:fg('fdvr_fam'),dvr_dni:fg('fdvr_dni'),dvr_hc:fg('fdvr_hc'),
+    dvr_peso:fg('fdvr_peso'),dvr_talla:fg('fdvr_talla'),dvr_imc:fg('fdvr_imc'),
+    dvr_gf:fsel('fdvr_gf'),dvr_grwr:fg('fdvr_grwr'),
+    causa_fallo:fg('fcausa'),fecha_retx:fg('fretxf'),
+    fecha_tx:fg('fftx'),abo:fsel('fabo'),riesgo:fsel('friesgo'),pra:fg('fpra'),dsa:fg('fdsa'),
+    donante:fsel('fdon'),tipo_injerto:fsel('ftinj'),
+    grwr:fg('fgrwr'),peso_explante:fg('fpexpl'),peso_implante:fg('fpimpl'),
+    tif:fg('ftif'),piggy_back:fsel('fpiggy'),portoplastia:fsel('fportop'),
+    graft_art:fsel('fgartf'),graft_ven:fsel('fgvenf'),
+    via_biliar:fg('fviabil'),cobertura:fg('fcob'),
+    mostrarInd:['post_inmediato','post_temprano','retx'].includes(mo),
+    tacro:fg('ftacro'),tacro_obj:fg('ftacroo'),tacro_dosis:fg('ftacrod'),
+    mmf:fsel('fmmf'),cort:fsel('fcort'),mtor:fsel('fmtor'),is_extra:FT.i.slice(),
+    rechazo:fsel('frec'),vascular:fsel('fvas'),biliar:fsel('fbil'),
+    infec:fsel('finf'),ptld:fsel('fptld'),otras:fg('fotras'),
+    bili:newLab.bili||fg('fbili'),bili_directa:newLab.bili_directa,
+    tgo:newLab.tgo,tgp:newLab.tgp,ggt:newLab.ggt,
+    tp:newLab.tp,inr:newLab.inr,alb:newLab.alb,creat:newLab.creat,
+    hb:newLab.hb,hto:newLab.hto,gb:newLab.gb,plaq:newLab.plaq,
+    urea:newLab.urea,afp:newLab.afp,lab_otro:fg('flab_otro'),
+    lab_history:labHistory,fk_history:fkFull,complicaciones_post:allComp,
+    fecha_inicio_atb:fg('ffatb'),abx:FT.a.slice(),atb:FT.t.slice(),cults:FC.slice(),
+    pcmv:fsel('fpcmv'),ppcp:fsel('fppcp'),paf:fsel('fpaf'),
+    nutri:fsel('fnutri'),diur:fg('fdiur'),vent:fsel('fvent'),hemodi:fsel('fhemo'),
+    obs:fg('fobs'),ts:Date.now()
+  },evals);
+  COMP=[];FKH=[];
+  savePx(p);
+}
+
+// SCORE
+function score(p){
+  var b=parseFloat(p.bili)||0,ir=parseFloat(p.inr)||0,tp=parseFloat(p.tp)||0;
+  var al=parseFloat(p.alb)||0,cr=parseFloat(p.creat)||0,tg=parseFloat(p.tgo)||0;
+  var dp=dias(p.fecha_tx)||0;
+  var s=0;
+  if(b>3)s++;if(b>5)s+=2;if(b>10)s+=2;if(b>20)s+=3;
+  if(ir>1.5)s++;if(ir>2)s+=2;if(ir>3)s+=2;
+  if(tp>0&&tp<50)s+=2;if(al>0&&al<3)s++;if(cr>1)s++;if(cr>2)s+=2;
+  if(tg>500)s++;if(tg>1000)s+=2;
+  var r=p.rechazo||'';
+  if(r==='Agudo leve')s+=2;if(r==='Agudo moderado')s+=4;if(r==='Agudo grave'||r==='Humoral (AMR)')s+=7;if(r==='Crónico / ductopénico')s+=5;
+  if(p.vascular&&p.vascular!=='No')s+=6;if(p.biliar&&p.biliar!=='No')s+=3;
+  var inf=p.infec||'';if(inf==='Bacteriana')s+=2;
+  if(['CMV','EBV','Adenovirus','Viral (otro)'].indexOf(inf)>=0)s+=3;
+  if(inf==='Fúngica'||inf==='Múltiple')s+=5;
+  if(p.estado&&p.estado.indexOf('Inestable')>=0)s+=3;
+  if(p.estado&&p.estado.indexOf('Crítico')>=0)s+=7;
+  var h=p.hemodi||'';if(h&&h!=='No')s+=(h==='Múltiples vasoactivos'?5:3);
+  if(s<=4)return{niv:'Evolución favorable',cls:'b-ok',de:Math.max(3,7-Math.floor(dp/5))};
+  if(s<=10)return{niv:'Complejidad moderada',cls:'b-med',de:Math.max(7,21-Math.floor(dp/3))};
+  if(s<=18)return{niv:'Alta complejidad',cls:'b-mal',de:Math.max(14,45-Math.floor(dp/2))};
+  return{niv:'Crítico',cls:'b-mal',de:null};
+}
+
+// STORAGE
+function lsave(d){try{localStorage.setItem(SK,JSON.stringify(d));}catch(e){}}
+function lload(){try{var d=localStorage.getItem(SK);return d?JSON.parse(d):[];}catch(e){return[];}}
+function psave(d){try{localStorage.setItem(SK+'_p',JSON.stringify(d));}catch(e){}}
+function pload(){try{var d=localStorage.getItem(SK+'_p');return d?JSON.parse(d):[];}catch(e){return[];}}
+pending=pload();
+
+function obUpdate(){
+  var b=document.getElementById('ob');if(!b)return;
+  if(!online){b.textContent='Sin conexión — los cambios se sincronizan al volver la señal.';b.className='offline-bar show';}
+  else if(pending.length){b.textContent=pending.length+' cambio(s) pendiente(s) de sincronizar.';b.className='offline-bar show';}
+  else{b.className='offline-bar';}
+}
+
+function pull(){
+  if(!online)return;
+  fetch(SU+'?action=list',{cache:'no-store'})
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.pacientes){lsave(d.pacientes);PXS=d.pacientes;renderSala(d.pacientes);dot('ok');}
+  }).catch(function(){dot('er');});
+}
+
+function push(body,cb){
+  fetch(SU,{method:'POST',body:JSON.stringify(body)})
+  .then(function(r){return r.json();})
+  .then(function(){if(cb)cb();})
+  .catch(function(){});
+}
+
+function flush(cb){
+  if(!pending.length||!online){if(cb)cb();return;}
+  var ops=pending.slice();pending=[];psave([]);
+  var i=0;
+  function next(){
+    if(i>=ops.length){if(cb)cb();return;}
+    push(ops[i],function(){i++;next();});
+    i++;
+  }
+  next();
+  obUpdate();
+}
+
+function savePx(p){
+  dot('sy');
+  var data=lload();
+  if(EID)data=data.filter(function(x){return x.id!==EID;});
+  data.push(p);lsave(data);PXS=data;EID=null;
+  renderSala(data);showSala();
+  if(online){
+    push({action:'save',paciente:p},function(){dot('ok');pull();});
+  }else{
+    pending.push({action:'save',paciente:p});psave(pending);obUpdate();dot('of');
+  }
+}
+
+function delPx(id){
+  if(!confirm('¿Eliminar este paciente?'))return;
+  var data=lload().filter(function(p){return p.id!==id;});
+  lsave(data);PXS=data;renderSala(data);showSala();
+  if(online)push({action:'delete',id:id},function(){pull();});
+  else{pending.push({action:'delete',id:id});psave(pending);obUpdate();}
+}
+
+function darAlta(id){
+  var p=PXS.find(function(x){return x.id===id;});if(!p)return;
+  if(!confirm('¿Dar de alta a '+p.nombre+'?\nEl paciente se archivará y no aparecerá más en el pase activo.'))return;
+  var pAlta=Object.assign({},p,{alta:true,fecha_alta:hoy()});
+  try{var altas=JSON.parse(localStorage.getItem(SK+'_altas')||'[]');altas.push(pAlta);localStorage.setItem(SK+'_altas',JSON.stringify(altas));}catch(e){}
+  var data=lload().filter(function(x){return x.id!==id;});
+  lsave(data);PXS=data;renderSala(data);showSala();
+  if(online){push({action:'save_alta',paciente:pAlta},function(){});push({action:'delete',id:id},function(){pull();});}
+  else{pending.push({action:'delete',id:id});psave(pending);obUpdate();}
+}
+
+function forceSync(){
+  setTab('t-sync');dot('sy');
+  flush(function(){pull();setTimeout(function(){setTab('t-sala');},600);});
+}
+
+function dot(s){
+  var el=document.getElementById('sdot'),sl=document.getElementById('slbl');
+  var colors={ok:'#27a',sy:'#BA7517',er:'#E24B4A',of:'#aaa'};
+  if(el)el.style.background=colors[s]||'#aaa';
+  if(sl)sl.textContent=s==='ok'?'OK '+new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}):s==='sy'?'Sincronizando...':s==='er'?'Error servidor':'Sin conexión';
+}
+
+// START
+
+// Pre-loaded patient data (pase 28/04/2026)
+var PRELOAD = [{"id":1001,"nombre":"G.I.","edad_n":"8","edad_u":"años","peso":"25.9","diag":"Atresia de vías biliares","enf_base":"AVB","hc":"","cirugia_previa":"Kasai: No","sala":"CIM 61","lugar_int":"8A","nacionalidad":"Argentino/a","momento":"post_tardio","estado":"Inestable","fecha_ingreso":"2026-04-01","fecha_tx":"2019-01-15","bili":"6.3","bili_directa":"4.9","tgo":"70","tgp":"54","ggt":"347","plaq":"460","inr":"1.2","rechazo":"Moderado (bx 08/04: rechazo moderado + pericolangitis + rechazo crónico F4/6)","vascular":"No","biliar":"No","infec":"Bacteriana","otras":"Bacteriemia por E. coli — ATB d9","tacro":"7","tacro_obj":"7","mmf":"Sí — dosis habitual","cort":"Mantenimiento","abx":["Piperacilina-Tazobactam d9","Deltisona 4mg/d","MMF 360/12h"],"obs":"FK XL 3 — MMF 360/12 — Deltisona 4 — PTZ d9\nEco 24/04: flujos conservados, VB con drenaje, esplenomegalia, líquido FID\nBx 08/04: rechazo moderado, pericolangitis, fibrosis F4/6\n\n🟠 PRONÓSTICO: Alta complejidad (score 18) — Días estimados adicionales: 30–60 días","pendientes":"Control eco Doppler","ts":1745000001001,"edad":"8 años"},{"id":1002,"nombre":"L.E.","edad_n":"12","edad_u":"años","peso":"18","diag":"Otra enfermedad metabólica","enf_base":"Enf. mitocondrial","hc":"","cirugia_previa":"No","sala":"CIM 61","lugar_int":"8A","momento":"post_tardio","estado":"Inestable","fecha_ingreso":"2026-04-01","fecha_tx":"2016-06-15","tacro":"2.3","tacro_obj":"5","mmf":"No","cort":"No / suspendido","obs":"ERCT progresiva → Pre-Tx renal. Polineuropatía Sensitivo/Motora.\nColocación catéter para diálisis 22/04. FK 2.3 (subterapéutico). Inicio diálisis martes.\nTto: FK XL 1\n\n🟢 PRONÓSTICO: Evolución favorable (score 3) — Días estimados adicionales: 7–14 días","pendientes":"Inicio diálisis — control FK — evaluación Tx renal","ts":1745000001002,"edad":"12 años"},{"id":1003,"nombre":"R.M.","edad_n":"8","edad_u":"meses","peso":"6.5","diag":"Atresia de vías biliares","enf_base":"AVB","cirugia_previa":"Kasai: No","sala":"CIM 61","lugar_int":"82","momento":"post_inmediato","estado":"Inestable","fecha_ingreso":"2026-01-15","fecha_tx":"2026-01-15","bili":"0.3","bili_directa":"0.2","tgo":"28","tgp":"13","ggt":"503","plaq":"111","rechazo":"No","vascular":"Trombosis vena porta (trombectomía 21 y 22/1)","biliar":"No","infec":"Fúngica","otras":"Candidiasis esofágica 14/4 — peritonitis previa por EVR","tacro":"0.5","tacro_obj":"7","abx":["Levofloxacina","Linezolid","Etambutol","Anidulafungina"],"pcmv":"Valganciclovir","paf":"Micafungina","obs":"Tx 01/26 DVR 2/3 AVB. Colostomía x peritonitis por EVR.\nCierre ostomía + bx hepática 21/04.\nTrombosis VP c/trombectomía 21 y 22/1. Estenosis arterial sin conducta Qx.\nCandidiasis esofágica 14/4.\nTto: FK 0.5/0.5 — AAS — Anidulafungina 4/6 sem — Valganciclovir\n\n🟡 PRONÓSTICO: Complejidad moderada (score 10) — Días estimados adicionales: 14–30 días","pendientes":"Recuperación POP cierre ostomía — control estenosis arterial","ts":1745000001003,"edad":"8 meses"},{"id":1004,"nombre":"M.E.","edad_n":"1","edad_u":"años","peso":"","diag":"Otro","enf_base":"Quiste de colédoco","cirugia_previa":"No","sala":"CIM 61","lugar_int":"83","momento":"post_inmediato","estado":"Inestable","fecha_ingreso":"2025-07-04","fecha_tx":"2025-07-04","bili":"0.5","tgo":"50","tgp":"67","ggt":"1154","plaq":"259","rechazo":"No","vascular":"Estenosis arteria hepática (TAC febrero — sin resolución)","biliar":"Estenosis biliar","infec":"Múltiple","otras":"Funguemia C. parapsilosis 20/4 — shock séptico 26/4 — múltiples colecciones abdominales por germen MR — URF 23/4 catarsis melénicas + oligoanuria + Hb 7.7","tacro":"9.6","tacro_dosis":"0.5mg","abx":["Cefta-Avibactam","Aztreonam","Metronidazol","Linezolid d4"],"paf":"Micafungina","obs":"ABO incompatible. Tx 04/07/25 DC asistolia. Colédoco-yeyuno x quiste de colédoco.\nURI 23/4: catarsis melénicas, oligoanuria, Hb 7.7. Inicia octreótide, ayuno.\nEco 25/4: arteria 0.5, porta fl s/p 22, VSH trifásica, VB no dilatada.\nAngioTAC pendiente.\n27/4: FK 9.6 — Anidulafungina d14 — Cefta-Avibactam — Aztreonam — Metronidazol — Linezolid d4\n\n🟡 PRONÓSTICO: Complejidad moderada (score 10) — Días estimados adicionales: 14–30 días","pendientes":"AngioTAC urgente — control cultivos post shock séptico 26/4 — evolución estenosis arterial","ts":1745000001004,"edad":"1 años"},{"id":1005,"nombre":"A.M.","edad_n":"6","edad_u":"meses","peso":"5.26","diag":"Atresia de vías biliares","enf_base":"AVB sin Kasai — BCGitis — Chiari I","cirugia_previa":"No","sala":"CIM 61","lugar_int":"74","momento":"post_inmediato","estado":"Compensado","fecha_ingreso":"2026-03-12","fecha_tx":"2026-03-12","bili":"0.3","bili_directa":"0.2","tgo":"28","tgp":"13","ggt":"503","plaq":"111","rechazo":"No","vascular":"No","infec":"Múltiple","otras":"Peritonitis por C. parapsilosis 31/3 — IRAB 10/4","tacro":"0.5","tacro_obj":"7","abx":["FK 0.5/0.5","AAS","Levofloxacina","Linezolid","Etambutol"],"paf":"Micafungina","pcmv":"Valganciclovir","obs":"Tx 12/03/26 DVR monosegmento II. CMV +/-. 0+/0+.\nPeritonitis por Candida parapsilosis 31/3. IRAB 10/4.\nDebito + octreótide. Intolerancia VO. Líquido PCD+.\nEco 20/4: colección 2.4x2.1x2.5 disminuye. VP flujo turbulento hilio normaliza IH.\n27/4: Bili 0.3/0.2 — TGO 28 — TGP 13 — GGT 503 — Plaq 111\n\n🟢 PRONÓSTICO: Evolución favorable (score 3) — Días estimados adicionales: 7–14 días","pendientes":"Control colección — tolerancia VO — control BCGitis","ts":1745000001005,"edad":"6 meses"},{"id":1006,"nombre":"P.L.","edad_n":"15","edad_u":"años","peso":"65.1","diag":"Enfermedad de Wilson","enf_base":"Wilson — ACLF","cirugia_previa":"No","sala":"CIM 61","lugar_int":"75","momento":"pre","estado":"Compensado","fecha_ingreso":"2026-03-21","meld":"No disponible","lista_estado":"Activo","bili":"3","bili_directa":"2.6","obs":"MI ACLF 2° Wilson. Cupruria 613 (25/3) → 4797 (30/3) → 4484 (15/4).\nCeruloplasmina 7. IgG 2380. ASMA 1/640. Anillos Kayser-Fleischer en OF.\nEstudio molecular FH en curso (17/4).\nCoag 27/4: 2.8/26. HPG 3/2/136/143/226/212.\nTto: D-Penicilamina 500 c/12hs (desde 28/3) — CTC 20\n\n🟢 PRONÓSTICO: Evolución favorable (score 0) — Días estimados adicionales: 7–14 días","pendientes":"Apto Infectología — resultado molecular","ts":1745000001006,"edad":"15 años"},{"id":1007,"nombre":"D.E.","edad_n":"12","edad_u":"años","peso":"34.4","diag":"Otra enfermedad metabólica","enf_base":"ERCT 2° poliquistosis renal + Fibrosis Hepática Congénita","cirugia_previa":"No","sala":"CIM 61","lugar_int":"70","momento":"post_temprano","estado":"Inestable","fecha_ingreso":"2026-04-07","fecha_tx":"2026-04-07","bili":"1","bili_directa":"1","tgo":"24","tgp":"54","ggt":"215","plaq":"217","inr":"1.2","rechazo":"Moderado (Bx 15/4 → pulsos GCC 18-20/4)","vascular":"Estenosis arteria hepática","biliar":"Estenosis biliar","infec":"Fúngica","otras":"NTA severa → Bx renal 17/4 — ITU por Cándida tropicalis 23/4 — HTA (días 10-14)","tacro":"8.4","tacro_obj":"9","mmf":"Sí — dosis habitual","cort":"Mantenimiento","abx":["FK 4/4","MMF 360/360","Deltisona 30mg/d","Valganciclovir","AAS"],"obs":"Tx hepatorrenal 07/04/26. DC HE. CMV+/+. Colédoco/Colédoco + doble J. ABO compatible (Donante VDRL+).\nHTA días 10-14. Colangioplastía + drenaje percutáneo 17/4.\nNTA severa → Bx renal 17/4. ITU por Cándida tropicalis 23/4.\nEco 23/4: AH parvus tardus. VP flujo turbulento hilio normaliza IH. VSH bifásica.\n27/4: Bili 1/1 — TGO 24 — TGP 54 — GGT 215 — FK 8.4\n\n🟠 PRONÓSTICO: Alta complejidad (score 14) — Días estimados adicionales: 30–60 días","pendientes":"AngioTAC con FG >50","ts":1745000001007,"edad":"12 años"},{"id":1008,"nombre":"R.E.","edad_n":"15","edad_u":"años","peso":"32.9","diag":"Hepatitis autoinmune (HAI)","enf_base":"HAI","cirugia_previa":"No","sala":"CIM 61","lugar_int":"62","momento":"post_temprano","estado":"Inestable","fecha_ingreso":"2026-02-25","fecha_tx":"2026-02-25","bili":"9.3","bili_directa":"3.6","tgo":"166","tgp":"17","creat":"1.65","inr":"1.0","rechazo":"No","vascular":"Trombosis arteria hepática (8/3 — sin posibilidad Qx)","biliar":"No","infec":"No","tacro":"10.4","tacro_obj":"9","mmf":"Sí — dosis habitual","cort":"Mantenimiento","abx":["FK XL 5","MMF 500/500","Corticoide 4mg/d"],"obs":"Tx 25/02/26 DC HE. Graft arterial. Col-Colédoco. ABO comp. CMV+/+. 2° HAI.\nACV hemorrágico 3/3 (DVE 3 al 18/3).\nTrombosis AH 8/3 sin posibilidad de tto quirúrgico.\nRx 22/4: aire distal OK. Eco 24/4: AH parvus tardus.\n27/4: FK 10.4 — Bili 9.3/3.6 — SA/22/17/166/17 — Cr 1.65\n\n🟠 PRONÓSTICO: Alta complejidad (score 11) — Días estimados adicionales: 30–60 días","pendientes":"IC gastroenterología — control colestasis","ts":1745000001008,"edad":"15 años"},{"id":1009,"nombre":"S.T.","edad_n":"12","edad_u":"años","peso":"38.6","diag":"Hepatitis autoinmune (HAI)","enf_base":"HAI — ACLF","cirugia_previa":"No","sala":"CIM 61","lugar_int":"62","momento":"pre","estado":"Inestable","fecha_ingreso":"2026-04-20","peld":"19","lista_estado":"Activo","bili":"29","bili_directa":"2.6","inr":"1.5","obs":"MI ACLF 2° HAI. ASMA 1/640. IgG 2760. PRA 35. A+.\nAnemia hemolítica por anticuerpos calientes.\n27/4: Bili 29/2.6. CTC 20.\n\n🟠 PRONÓSTICO: Alta complejidad (score 11) — Días estimados adicionales: 30–60 días","pendientes":"Evaluación pre-Tx completa — IC hematología anemia hemolítica","ts":1745000001009,"edad":"12 años"},{"id":1010,"nombre":"G.L.","edad_n":"5","edad_u":"años","peso":"","diag":"Atresia de vías biliares","enf_base":"AVB sin Kasai — colangiopatía isquémica","cirugia_previa":"Kasai: No","sala":"CIM 61","lugar_int":"58","momento":"retx","estado":"Inestable","fecha_ingreso":"2026-04-22","fecha_tx":"2022-03-15","causa_fallo":"Colangiopatía isquémica — estenosis vía biliar","peld":"31","lista_estado":"Activo","bili":"27","bili_directa":"21","tgo":"225","tgp":"381","ggt":"165","inr":"1.5","rechazo":"No","biliar":"Estenosis biliar","infec":"Bacteriana","otras":"Colonización PICC por E. faecalis y S. haemolyticus — fiebre/encefalopatía 22/4","obs":"Plan re-Tx. PELD 31. Tx hepático 3/22 AVB sin Kasai.\nColangiografía 9/4: Dr EI abierto. CRMN 31/3: dilatación toda la VB del SIII.\nBili 31 (14/4). MI 22/4: fiebre + encefalopatía.\nColonización PICC por E. faecalis y S. haemolyticus 5/4 (retirado).\nManejo SAE. Causa social: medida de abrigo.\n\n🟠 PRONÓSTICO: Alta complejidad (score 14) — Días estimados adicionales: 30–60 días","pendientes":"Ateneo viernes — reunión con mamá — control SAE","ts":1745000001010,"edad":"5 años"},{"id":1011,"nombre":"O.M.","edad_n":"3","edad_u":"años","peso":"10.6","diag":"Hepatoblastoma","enf_base":"Hepatoblastoma epitelial AR con MTS pulmonares — DBP/HTP — CIA","cirugia_previa":"No","sala":"CIM 61","lugar_int":"48","momento":"post_temprano","estado":"Inestable","fecha_ingreso":"2025-11-15","fecha_tx":"2025-11-15","bili":"0.1","bili_directa":"0.1","tgo":"42","tgp":"66","ggt":"334","plaq":"680","afp":"3182","rechazo":"No","vascular":"No","infec":"Bacteriana","otras":"Reactivación CMV 7/4 — bacteriemia S. epidermidis 18/4 — rinovirus 24/2 — TVP iliaca dcha 9/12/25 — masa hepática en estudio","obs":"Tx 11/25 DVR II/III. CMV+/+. A+/0+. 2° Hepatoblastoma epitelial AR con MTS pulmonares (5/25).\nDBP/HTP. DNT crónica. CIA. TVP iliaca dcha 9/12/25.\nReactivación CMV 7/4. Bacteriemia x S. epidermidis 18/4. Rinovirus 24/2.\nMasa hepática en estudio. AFP 3182 (21/4).\n27/4: Bili 0.1/0.1 — TGO 42 — TGP 66 — GGT 334 — Plaq 680 — Siro 15.\nTto: OxCN — PTZ — Enoxaparina — Sirolimus 2mg/día (miércoles)\n\n🟡 PRONÓSTICO: Complejidad moderada (score 6) — Días estimados adicionales: 14–30 días","pendientes":"Eco VB — Quimio jueves y revalor — resultado masa hepática","ts":1745000001011,"edad":"3 años"},{"id":1012,"nombre":"A.F.","edad_n":"","edad_u":"años","peso":"61","diag":"Defecto del ciclo de la urea","enf_base":"Hiperamonemia — estudio etiológico","cirugia_previa":"No","sala":"CIM 61","lugar_int":"49","momento":"pre","estado":"Compensado","fecha_ingreso":"2026-04-20","obs":"MI hiperamonemia. Amonio 154.\nEstudio etiológico en curso.\n\n🟢 PRONÓSTICO: Evolución favorable (score 0) — Días estimados adicionales: 7–14 días","pendientes":"Estudio etiológico hiperamonemia — IC metabólica","ts":1745000001012,"edad":"—"},{"id":1013,"nombre":"L.R.","edad_n":"11","edad_u":"años","peso":"","diag":"Hepatitis autoinmune (HAI)","enf_base":"Síndrome superposición HAI + colangitis ulcerosa","cirugia_previa":"No","sala":"CIM 61","lugar_int":"49","momento":"post_inmediato","estado":"Inestable","fecha_ingreso":"2026-04-19","fecha_tx":"2026-04-19","bili":"11","bili_directa":"8","tgo":"33","tgp":"68","ggt":"290","plaq":"144","inr":"1.3","rechazo":"No","vascular":"No","biliar":"Estenosis biliar","infec":"Fúngica","otras":"Síndrome hepatopulmonar post-Tx — disfunción injerto patrón colestásico — ecocardio con burbujas (+?)","tacro":"6.1","tacro_obj":"9","mmf":"Sí — dosis habitual","cort":"Mantenimiento","abx":["FK 3/3","MMF 360/360","Deltisona 4mg/d","Anidulafungina","Ganciclovir"],"pcmv":"Ganciclovir IV","paf":"Micafungina","obs":"Tx 19/04/26 DC HE. ABO compatible. CMV+/+. Graft arterial. Colédoco-Colédoco. 2° Sx superposición HAI+CU.\nTimoglobulina 20/4 — 22/4 — 25/4. SHF post-Tx.\nDisfunción injerto patrón colestásico. 2 drenajes abdominales.\nEco 26/4: arteria 0.6, porta 60, VSH trifásica, VB 6mm/5.3, colección subhepática disminuida 4x0.6x2.5.\nColangioRMN 27/4 (resultado pendiente).\n27/4: Bili 11/8 — TGO 33 — TGP 68 — GGT 290 — FK 6.1\n\n🟠 PRONÓSTICO: Alta complejidad (score 11) — Días estimados adicionales: 30–60 días","pendientes":"Resultado ColangioRMN 27/4 — EXPLANTE pendiente — control ecocardiograma burbujas","ts":1745000001013,"edad":"11 años"},{"id":1014,"nombre":"O.F.","edad_n":"12","edad_u":"años","peso":"","diag":"Hepatitis autoinmune (HAI)","enf_base":"Hepatitis aguda grave","cirugia_previa":"No","sala":"CIM 32","lugar_int":"17","momento":"pre","estado":"Inestable","fecha_ingreso":"2026-04-20","bili":"15","bili_directa":"11","tgo":"1809","tgp":"1539","ggt":"447","creat":"1.9","inr":"1.5","obs":"MI hepatitis aguda grave. CD8 y Parvovirus B19 en estudio.\nGammaglobulina x2 en evaluación. Bx hepática miércoles.\n27/4: Bili 15/11 — TGO 1809 — TGP 1539 — GGT 447 — Cr 1.9\n\n🟠 PRONÓSTICO: Alta complejidad (score 12) — Días estimados adicionales: 30–60 días","pendientes":"Bx hepática miércoles — resultado CD8/Parvovirus — gammaglobulina IV","ts":1745000001014,"edad":"12 años"},{"id":1015,"nombre":"F.S.","edad_n":"7","edad_u":"meses","peso":"","diag":"Atresia de vías biliares","enf_base":"AVB con Kasai","cirugia_previa":"Kasai: Sí","sala":"CIM 32","lugar_int":"41","momento":"pre","estado":"Estable","fecha_ingreso":"2026-04-15","peld":"18","lista_estado":"Activo","bili":"2.8","bili_directa":"2.2","tgo":"81","tgp":"61","ggt":"579","plaq":"128","inr":"1.6","obs":"AVB con Kasai. Colangitis 12/2. PELD 18. Posible donante: papá (en estudio).\nFiebre → HMC. Si repite: PTZ.\n\n🟢 PRONÓSTICO: Evolución favorable (score 1) — Días estimados adicionales: 7–14 días","pendientes":"Resultado HMC — estudio papá como DVR potencial","ts":1745000001015,"edad":"7 meses"},{"id":1016,"nombre":"L.B.","edad_n":"3","edad_u":"años","peso":"","diag":"Atresia de vías biliares","enf_base":"AB quística sin Kasai","cirugia_previa":"Kasai: No","sala":"CIM 62","lugar_int":"17","momento":"post_tardio","estado":"Estable","fecha_ingreso":"2026-04-20","fecha_tx":"2023-08-15","tacro":"2.9","tacro_obj":"3","infec":"Viral (otro)","otras":"Influenza A — HMC negativo","abx":["Oseltamivir"],"obs":"Tx 08/2023. MI fiebre foco respiratorio. Influenza A + oseltamivir. HMC -/-.\nFK 2.9 (1 c/24h).\n\n🟢 PRONÓSTICO: Evolución favorable (score 3) — Días estimados adicionales: 7–14 días","pendientes":"Control Influenza A — normalización estado general","ts":1745000001016,"edad":"3 años"},{"id":1017,"nombre":"L.N.","edad_n":"4","edad_u":"meses","peso":"","diag":"Atresia de vías biliares","enf_base":"AVB — ACLF","cirugia_previa":"No","sala":"CIM 62","lugar_int":"49","momento":"pre","estado":"Inestable","fecha_ingreso":"2026-04-20","peld":"18","lista_estado":"Activo","bili":"25","bili_directa":"20","tgo":"895","tgp":"416","ggt":"605","plaq":"128","obs":"AVB. Inscripta en lista. PELD 18 (A). MI: ACLF.\nEstudio papá como DVR potencial.\n24/4: Bili 25/20 — TGO 895 — TGP 416 — GGT 605 — Plaq 128.\n\n🟠 PRONÓSTICO: Alta complejidad (score 12) — Días estimados adicionales: 30–60 días","pendientes":"Estudio papá como DVR — evaluación pre-Tx completa — evolución ACLF","ts":1745000001017,"edad":"4 meses"},{"id":1018,"nombre":"M.C.","edad_n":"14","edad_u":"años","peso":"","diag":"Otro","enf_base":"Inmunodeficiencia combinada — TMO","cirugia_previa":"No","sala":"TMO 64","lugar_int":"64","momento":"post_inmediato","estado":"Estable","fecha_ingreso":"2026-03-21","fecha_tx":"2026-03-21","bili":"0.1","bili_directa":"0.2","tgo":"13","tgp":"16","tacro":"13","tacro_obj":"12","obs":"TMO 21/03/26. Inmunodeficiencia combinada.\nAcondicionamiento Pre-TMO. Eco: flujos OK. VB 4.8.\nFK 13 (2 c/12h) — acondicionamiento en curso.\n\n🟢 PRONÓSTICO: Evolución favorable (score 0) — Días estimados adicionales: 7–14 días","pendientes":"Monitoreo post-acondicionamiento — control función hepática","ts":1745000001018,"edad":"14 años"},{"id":1019,"nombre":"M.B.","edad_n":"10","edad_u":"meses","peso":"","diag":"Atresia de vías biliares","enf_base":"AVB / Kasai","cirugia_previa":"Kasai: Sí","sala":"UCI 44","lugar_int":"44","momento":"post_inmediato","estado":"Inestable","fecha_ingreso":"2026-01-29","fecha_tx":"2026-01-29","infec":"Viral (otro)","otras":"IRAB — Rinovirus — VNI","vent":"VNI (CPAP/BiPAP)","obs":"Tx 29/01/26 2° AVB con Kasai.\nMI: IRAB. VNI con Rinovirus.\n\n🟡 PRONÓSTICO: Complejidad moderada (score 6) — Días estimados adicionales: 14–30 días","pendientes":"Destete VNI — control respiratorio","ts":1745000001019,"edad":"10 meses"},{"id":1020,"nombre":"S.M.","edad_n":"11","edad_u":"años","peso":"55","diag":"Hepatitis autoinmune (HAI)","enf_base":"HAI — ACLF","cirugia_previa":"No","sala":"UCI 45","lugar_int":"45","momento":"pre","estado":"Crítico (UCI/UTIP)","fecha_ingreso":"2026-04-20","peld":"24","lista_estado":"Activo","bili":"18","tgo":"51","tgp":"55","ggt":"327","alb":"3.2","inr":"4.06","obs":"MI ACLF 2° HAI. Chaco. PELD 24. 0+. 55kg.\nIgG 5720. ASMA 1/1280. Amonio 254.\nEco 27/4: hígado disminuido de tamaño, lobulado, heterogéneo, con líquido.\nSacaron ATB. Descenso CTC 8.\n27/4: Bili 18 — INR 4.06 — TGO 51 — TGP 55 — GGT 327 — Alb 3.2 — Amonio 254\n\n🟠 PRONÓSTICO: Alta complejidad (score 15) — Días estimados adicionales: 30–60 días","pendientes":"Monitoreo ACLF — amonio — evaluación para lista urgente","ts":1745000001020,"edad":"11 años"}];
+try {
+  var existing = localStorage.getItem('pase_v8');
+  if (!existing || JSON.parse(existing).length === 0) {
+    localStorage.setItem('pase_v8', JSON.stringify(PRELOAD));
+  }
+} catch(e) {}
+
+
+function showGuia(){
+  ['pnl-sala','pnl-det','pnl-form'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='none';});
+  document.getElementById('pnl-guia').style.display='';
+  setTab('t-guia');
+  window.scrollTo(0,0);
+}
+
+var PROTOCOLOS={};
+PROTOCOLOS.ramct={title:'Rechazo Agudo (RAMCT) — Garrahan',html:'<div class="proto-h">Prevalencia: 25-50% Tx pediatricos. Diagnostico (Banff): inflamacion portal mixta + inflamacion conductos biliares + endoteliolitis.</div><div class="proto-box ok"><b>A. Leve sin disfuncion:</b> FK 6-9 ng/mL x3m. Prednisona VO: &lt;20kg: 4mg/d · ≥20kg: 8mg/d x3m.</div><div class="proto-box warning"><b>B. Leve con disfuncion:</b> FK 9-12 ng/mL. Metilprednisolona EV 10mg/kg/d x3 dias. Prednisona VO segun peso x3m.</div><div class="proto-box danger"><b>C. Moderado-Severo:</b> FK 9-12 ng/mL. MP EV 10mg/kg/d x3d. MMF: 10mg/kg/dosis c/12h x2sem → 40mg/kg/d. Profilaxis P.jirovecii y ulcera gastrica.</div><div class="proto-box danger"><b>D. Corticorresistente</b> (sin reduccion ≥50% transaminasas tras 3° pulso):<br>Rebiopsia + DSA single antigen. Reducir FK 4-6 ng/mL. Timoglobulina 1mg/kg/d x7 dias. Profilaxis CMV, hongos y P.jirovecii.</div>'};
+PROTOCOLOS.tah={title:'Trombosis Arteria Hepatica (TAH)',html:'<div class="proto-box danger"><b>EMERGENCIA QUIRURGICA</b> — Prevalencia 5-10%. Sin tratamiento: perdida del injerto 80-90%.</div><div class="proto-h">Diagnostico</div><div class="proto-box">Eco Doppler: patron tardus-parvus, IR &lt;0.5 → TC trifasica → Angiografia DSA (confirmatorio)</div><div class="proto-h">Manejo segun presentacion</div><div class="proto-box warning"><b>Estenosis &gt;50%:</b> angioplastia con balon + anticoagulacion x6 meses</div><div class="proto-box danger"><b>Trombosis temprana (&lt;48h):</b> trombectomia + anticoagulacion x6 meses</div><div class="proto-box danger"><b>Con falla del injerto, sepsis o fistula biliar:</b> RETRASPLANTE URGENTE → inscribir Emergencia Nacional</div><div class="proto-box danger"><b>Trombosis tardia con colangiopatia:</b> retrasplante programado</div>'};
+PROTOCOLOS.tpp={title:'Trombosis Portal Post-Tx (TPP)',html:'<div class="proto-box danger">Prevalencia: 5-15% pediatricos. Forma temprana (&lt;30 dias): perdida del injerto &gt;50% sin tratamiento.</div><div class="proto-h">Diagnostico</div><div class="proto-box">Eco Doppler portal: disminucion o ausencia de flujo → TC trifasica con reconstruccion 3D</div><div class="proto-h">Manejo</div><div class="proto-box warning"><b>Estenosis portal:</b> portoplastia con balon + anticoagulacion x6 meses. Recurrencia tras 2 dilataciones → stent</div><div class="proto-box danger"><b>Trombosis temprana (&lt;48h):</b> trombectomia quirurgica</div><div class="proto-box danger"><b>Con falla del injerto:</b> retrasplante urgente</div>'};
+PROTOCOLOS.cmv={title:'Infeccion por CMV',html:'<div class="proto-box">Prevalencia: 20-30% Tx pediatricos. Mortalidad ≈10%. Tiempo: primeros 3 meses post-Tx.</div><div class="proto-h">Diagnostico</div><div class="proto-box">PCR cuantitativa en plasma <b>&gt;5000 UI/mL</b>. Biopsia con inmunohistoquimica (cuerpos de inclusion).</div><div class="proto-h">Tratamiento</div><div class="proto-box warning"><b>Ganciclovir IV:</b> 10mg/kg/dia c/12h por ≥2 semanas hasta mejoria clinica y negativizacion de 2 cargas virales consecutivas.<br>Monitoreo semanal: carga viral, leucocitos, plaquetas, creatinina.<br>NO reducir dosis por leucopenia o trombocitopenia. Ajustar a funcion renal.</div><div class="proto-box"><b>Transicion a Valganciclovir VO:</b> 900mg c/12h tras mejoria clinica.</div><div class="proto-box danger"><b>CMV refractario</b> (sin descenso &gt;1 log en 2 sem):<br>Solicitar mutaciones UL97 y UL54 (ANLIS-Malbran). Foscarnet si resistencia confirmada.</div>'};
+PROTOCOLOS.ptld={title:'PTLD — Sindrome Linfoproliferativo',html:'<div class="proto-box danger">Prevalencia: 5-10%. Mortalidad ≈40%. 80% casos VEB+ en 1° año post-Tx.</div><div class="proto-h">Clinica</div><div class="proto-box">Fiebre &gt;3d sin foco · Perdida de peso · Nodal: hipertrofia amigdalas, adenomegalias, visceromegalias · Extranodal: citopenia, hepatitis (33%), ascitis, neumonitis, encefalitis</div><div class="proto-h">Diagnostico</div><div class="proto-box">Hemograma: &gt;5% linfocitos atipicos. Anti-CD20. LDH. PCR VEB en plasma. PET-TC para estadificacion. Biopsia tumoral (CD20 y EBER).</div><div class="proto-h">Factores de mal pronostico</div><div class="proto-box warning">Inicio tardio (&gt;1 año) · Compromiso multiorganico · LDH ≥1000 UI/L · PTLD monomofico EBV negativo · Sin respuesta a RIS en 4 semanas</div><div class="proto-h">Manejo</div><div class="proto-box"><b>1.</b> Reducir inmunosupresion (RIS)</div><div class="proto-box warning"><b>2. PTLD monomofica B CD20+:</b> Rituximab EV 375 mg/m² semanal x3-4 dosis (goteo lento 4-6h). Premedicacion: acetaminofen + difenhidramina.</div><div class="proto-box danger"><b>3. Burkitt, Linfoma T o Hodgkin:</b> quimioterapia multidroga</div>'};
+PROTOCOLOS.biliar={title:'Complicaciones Biliares Post-Tx',html:'<div class="proto-h">Fistula Biliar — Prevalencia ≈15% (predominio 1° mes)</div><div class="proto-box warning"><b>Manejo:</b><br>1. Verificar permeabilidad arteria hepatica (Eco Doppler)<br>2. Si permeable + fistula anastomotica:<br>   • Receptor &gt;40 kg: CPRE con esfinterotomia ± stent<br>   • &lt;40 kg: drenaje transhepatico percutaneo<br>3. Trombosis arterial → evaluar retrasplante</div><div class="proto-h">Estenosis Biliar — Prevalencia ≈35% (primeros 6 meses)</div><div class="proto-box warning"><b>Manejo:</b><br>1. Confirmar permeabilidad arteria hepatica<br>2. Si permeable:<br>   • Coledoco-coledoco + &gt;40 kg: CPRE dilatacion balon ± stent<br>   • Anastomosis biliodigestiva: drenaje percutaneo x6 meses<br>3. Fracaso → reconstruccion quirurgica biliar<br>4. Trombosis arterial o colangiopatia isquemica → retrasplante</div><div class="proto-box"><b>AUDC:</b> 30 mg/kg/dia VO c/12h (max 450mg c/12h)</div>'};
+PROTOCOLOS.profilaxis={title:'Profilaxis Post-Tx Inmediato — Garrahan',html:'<div class="proto-h">Infecciosa</div><table class="drug-table"><tr><th>Tipo</th><th>Farmaco</th><th>Dosis</th><th>Duracion</th></tr><tr><td>Bacteriana</td><td>Pip-Tazo</td><td>300 mg/kg/dia EV c/6h</td><td>24-48h</td></tr><tr><td>P. jirovecii</td><td>TMP-SMX</td><td>5 mg/kg/dosis TMP 3x/sem</td><td>6 meses</td></tr><tr><td>CMV D+/R-</td><td>Ganciclovir → Valganciclovir</td><td>5mg/kg c/12h → 900mg/d</td><td>3-6 meses</td></tr><tr><td>Antifungica alto riesgo</td><td>Anidulafungina</td><td>Carga 3mg/kg → 1.5mg/kg/d</td><td>7-14 dias</td></tr><tr><td>Antifungica estandar</td><td>Fluconazol</td><td>6-12 mg/kg/dia</td><td>7 dias</td></tr></table><div class="proto-h">Antitrombótica</div><div class="proto-box">• ATIII: 50 UI/kg EV al cierre; repetir si &lt;70%<br>• Heparina sodica: &gt;1 año: 15 UI/kg/h / &lt;1 año: 20 UI/kg/h — desde 24-48h si RIN &lt;1.8 y plaquetas &gt;40.000<br>• AAS: 3-5 mg/kg/dia x6 meses</div><div class="proto-h">IS segun riesgo ABO compatible</div><table class="drug-table"><tr><th>Riesgo</th><th>Criterio</th><th>Induccion</th><th>Mantenimiento</th></tr><tr><td>Bajo</td><td>PRA 0%</td><td>MP 10mg/kg EV + Timoglobulina 1.5mg/kg/d x4d</td><td>Tacrolimus 0.1-0.15 mg/kg/d c/12h</td></tr><tr><td>Moderado</td><td>PRA&gt;0%, autoinmunes</td><td>IgG 1g/kg/d x2d + MP + Timoglobulina x4d</td><td>FK + MMF 600mg/m² c/12h + Prednisona 1-2mg/kg/d (→retiro a 3m)</td></tr><tr><td>Alto</td><td>DSA+</td><td>IgG 2g/kg + MP + Timoglobulina + Rituximab 375mg/m²</td><td>FK + MMF + Prednisona en descenso</td></tr></table>'};
+PROTOCOLOS.alarma={title:'Signos de Alarma — Primeras 72 horas',html:'<div class="proto-box danger"><b>Hepatico:</b> AST/ALT &gt;5000 UI/L → Eco Doppler urgente (descartar TAH) · Ictericia precoz · Bilirrubina &gt;10 mg/dL persistente o ascendente al dia 5-7 · INR &gt;2 sostenido</div><div class="proto-box danger"><b>Vascular:</b> Ausencia de flujo en arteria hepatica o vena porta → Eco Doppler urgente, reexploracion</div><div class="proto-box warning"><b>Hemodinamico:</b> TAM &lt;p5 → confirmar volemia, eco, vasopresores · Taquicardia &gt;20% basal</div><div class="proto-box warning"><b>Renal:</b> Diuresis &lt;1 mL/kg/h &gt;2h → eco Doppler, optimizar perfusion</div><div class="proto-box warning"><b>Respiratorio:</b> SatO2 &lt;92% con O2 · Falla de extubacion → reintubar, optimizar liquidos</div><div class="proto-box warning"><b>Neurologico:</b> Glasgow ↓ subito → glucosa EV, neuroimagen · Convulsiones → hiponatremia o toxicidad tacrolimus (PRES)</div><div class="proto-box warning"><b>Metabolico:</b> Hipoglucemia &lt;60 mg/dL · Lactato &gt;4 mmol/L persistente</div><div class="proto-box"><b>Infeccioso:</b> Fiebre &gt;38°C o T &lt;36°C → cultivos + ATB empirico urgente</div><div class="proto-h">Laboratorio diario primeros 7 dias</div><div class="proto-box">Gasometria · Lactato · Hepatograma · Coagulograma · Hemograma · Ionograma · Glucemia · Amonio · Albumina · Urea/creatinina · Niveles Tacrolimus. PCR-EBV y CMV semanal.</div>'};
+PROTOCOLOS.is={title:'Inmunosupresion — Dosis y Niveles Garrahan',html:'<div class="proto-h">Tacrolimus (FK) — Niveles objetivo</div><div class="proto-box">Dosis inicial: 0.1-0.15 mg/kg/dia VO c/12h (en ayunas)<br><b>Niveles:</b> 1° semestre: 7-10 ng/mL · hasta 1 año: 5-7 ng/mL · &gt;1 año biopsia normal: 3-5 ng/mL<br><b>Interacciones:</b> ↑: macrolidos, azoles, MP, omeprazol · ↓: carbamazepina, fenobarbital, rifampicina</div><div class="proto-h">Metilprednisolona — Esquema reciclado</div><table class="drug-table"><tr><th>Dia</th><th>&gt;40 kg</th><th>20-40 kg</th><th>10-20 kg</th><th>&lt;10 kg</th></tr><tr><td>1</td><td>200mg</td><td>150mg</td><td>100mg</td><td>40mg</td></tr><tr><td>2</td><td>150mg</td><td>100mg</td><td>40mg</td><td>20mg</td></tr><tr><td>3</td><td>100mg</td><td>40mg</td><td>20mg</td><td>16mg</td></tr><tr><td>4</td><td>40mg</td><td>20mg</td><td>16mg</td><td>8mg</td></tr><tr><td>5</td><td>20mg</td><td>16mg</td><td>8mg</td><td>4mg</td></tr><tr><td>6</td><td>16mg</td><td>8mg</td><td>4mg</td><td>—</td></tr><tr><td>7</td><td>8mg</td><td>4mg</td><td>—</td><td>—</td></tr><tr><td>8</td><td>4mg</td><td>—</td><td>—</td><td>—</td></tr></table><div class="proto-h">MMF (Micofenolato Mofetil)</div><div class="proto-box">Dosis: 600 mg/m²/dosis VO/EV c/12h · EA: diarrea, supresion medular, infecciones (CMV) · No asociar con azatioprina</div><div class="proto-h">Timoglobulina</div><div class="proto-box">1.5 mg/kg/dia EV (infusion 6h) x4 dias (total 6 mg/kg). Premedicacion: antihistaminico + paracetamol + corticosteroides. Profilaxis CMV y fungica obligatoria.</div>'};
+PROTOCOLOS.peld={title:'PELD / MELD — Mortalidad estimada',html:'<div class="proto-box"><b>PELD:</b> &lt;12 años · <b>MELD:</b> ≥12 años</div><div class="proto-h">Mortalidad estimada a 3 meses (UNOS/OPTN, EASL 2024)</div><table class="drug-table"><tr><th>Score</th><th>Mortalidad a 3m</th><th>Actualizacion</th></tr><tr><td>&lt;9</td><td>&lt;2%</td><td>Anual</td></tr><tr><td>10-14</td><td>≈6%</td><td>Cada 3 meses</td></tr><tr><td>15-19</td><td>≈6-20%</td><td>Cada 30 dias. Considerar Tx</td></tr><tr><td>20-29</td><td>≈20%</td><td>Cada 7 dias. Priorizar</td></tr><tr><td>30-39</td><td>≈53%</td><td>Alta prioridad</td></tr><tr><td>≥40</td><td>≈71%</td><td>Urgencia. Emergencia Nacional</td></tr></table><div class="proto-h">Emergencia Nacional — Criterios</div><div class="proto-box warning">• Falla hepatica fulminante (FHA)<br>• Falla primaria del injerto<br>• Trombosis arteria hepatica &lt;7 dias post-Tx</div>'};
+
+function showProtocolo(key){
+  var p=PROTOCOLOS[key];if(!p)return;
+  document.getElementById('guia-menu').style.display='none';
+  document.getElementById('guia-content').style.display='';
+  document.getElementById('guia-inner').innerHTML='<h2 style="font-size:15px;font-weight:700;margin-bottom:.9rem;">'+p.title+'</h2>'+p.html;
+  window.scrollTo(0,0);
+}
+
+
+// ---- AUTH ----
+var USERS = {
+  'txhepatico': 'trasplante2024',
+  'residente': 'trasplante2024',
+  'enfermeria': 'trasplante2024'
+};
+var SESSION_KEY = 'pase_auth_v1';
+
+function checkSession(){
+  try{
+    var s = sessionStorage.getItem(SESSION_KEY);
+    return s === 'ok';
+  }catch(e){return false;}
+}
+
+function doLogin(){
+  var user = document.getElementById('login-user').value.trim().toLowerCase();
+  var pass = document.getElementById('login-pass').value;
+  var err = document.getElementById('login-error');
+  if(USERS[user] && USERS[user] === pass){
+    try{sessionStorage.setItem(SESSION_KEY,'ok');}catch(e){}
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('main-app').style.display='';
+    err.className='login-error';
+  } else {
+    err.className='login-error show';
+    document.getElementById('login-pass').value='';
+    document.getElementById('login-pass').focus();
+  }
+}
+
+// Check session on load
+if(checkSession()){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('main-app').style.display='';
+}
+
+var localData=lload();
+if(localData.length){PXS=localData;renderSala(localData);}else{renderSala([]);}
+if(online){flush(function(){pull();});}else{dot('of');obUpdate();}
+setInterval(function(){if(online)pull();},15000);
+setInterval(function(){if(PXS.length)renderSala(PXS);},60000);
+</script>
+</body>
+</html>
